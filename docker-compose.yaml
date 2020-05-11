@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  app:
+    restart: always
+    hostname: app
+    container_name: event-server_app
+    networks:
+      - eventserver
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: root
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_SSLMODE: disable
+  postgres:
+    restart: always
+    hostname: postgres
+    container_name: postgres
+    networks:
+      - eventserver
+    build:
+      context: ./docker/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: root
+
+networks:
+  eventserver:
