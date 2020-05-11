@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"bitbucket.org/pbisse/eventserver/api"
+)
 
 func main() {
-	fmt.Print("test")
+	a := api.App{}
+	a.Initialize()
+	a.Run(":8000")
 }
