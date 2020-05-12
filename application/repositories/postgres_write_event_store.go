@@ -4,6 +4,7 @@ import (
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 type postgresWriteEventStore struct {
@@ -17,13 +18,15 @@ func NewPostgresWriteEventStore(sqlManger *sql.DB) *postgresWriteEventStore {
 func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, streamName types.StreamName, event types.Event) string {
 	relatedProducerId := p.getProducerIdForStreamName(streamName)
 
+	var err error
+
 	if relatedProducerId.UUID == "" {
 		p.saveProducerStreamRelation(producerId, streamName)
 		relatedProducerId.UUID = producerId.UUID
 	}
 
 	if relatedProducerId.UUID != producerId.UUID {
-		err := errors.New("stream is reserved for another producer")
+		err := errors.New(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerId.UUID))
 		return err.Error()
 	}
 
@@ -31,15 +34,13 @@ func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, strea
 		"VALUES ($1,$2, (SELECT COALESCE(MAX(\"sequence\"),0) FROM \"events\" " +
 		"WHERE \"streamName\" = $3 AND \"eventName\" = $4 LIMIT 1) + 1, $5, $6)"
 
-	var err error
-
 	_, err = p.sqlManager.Query(query, streamName.Name, event.EventName, streamName.Name, event.EventName, event.EventId, event.Payload)
 
 	if err != nil {
 		return err.Error()
 	}
 
-	return "Created"
+	return event.EventId
 }
 
 func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.StreamName) types.ProducerId {
