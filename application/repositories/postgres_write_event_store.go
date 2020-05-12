@@ -100,7 +100,7 @@ func (p *postgresWriteEventStore) getEventNameAndSequence (streamName types.Stre
 		streamName.Name, eventId.UUID.String())
 
 	if err := row.Scan(&eventName.Name, &sequence.Pointer); err != nil {
-		err := errors.New(fmt.Sprintf("event not found in stream %s/%s", streamName, eventId))
+		err := errors.New(fmt.Sprintf("event not found in stream %s/%s", streamName.Name, eventId.UUID.String()))
 
 		return eventName, sequence, err
 	}
