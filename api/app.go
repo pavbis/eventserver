@@ -67,7 +67,7 @@ func (a *App) initializeRoutes() {
 	api := a.Router.PathPrefix("/api/v1").Subrouter()
 	api.HandleFunc(
 		"/streams/{streamName}/events",
-		a.receiveEventRequestHandler).Methods(http.MethodPost)
+		basicAuthMiddleware(userName, password, a.receiveEventRequestHandler)).Methods(http.MethodPost)
 }
 
 func (a *App) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
