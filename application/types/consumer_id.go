@@ -2,6 +2,6 @@ package types
 
 import "github.com/google/uuid"
 
-type EventId struct {
+type ConsumerId struct {
 	UUID uuid.UUID
 }

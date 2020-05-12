@@ -16,7 +16,7 @@ var (
 	dbUser     = "root"
 	dbPassword = "root"
 	dbName     = "testdb"
-	dbHost     = "postgres"
+	dbHost     = "localhost"
 	dbSSLMode  = "disable"
 )
 

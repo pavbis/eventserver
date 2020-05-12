@@ -4,6 +4,7 @@ import (
 	"bitbucket.org/pbisse/eventserver/api/input"
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"bitbucket.org/pbisse/eventserver/application/types"
+	"encoding/json"
 	"github.com/google/uuid"
 	"net/http"
 )
@@ -25,11 +26,19 @@ func (a *App) receiveEventRequestHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	event := types.Event{
-		EventId:   uuid.New().String(),
-		EventName: "Golang",
-		Payload:   "{\n   \"foo\":\"bar\"\n}",
+	var event types.Event
+	err := json.NewDecoder(r.Body).Decode(&event)
+	if err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
 	}
+
+	if err := a.validate.Struct(event); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	event.EventId = uuid.New().String()
 
 	producerId := types.ProducerId{UUID: receiveEventRequest.XProducerId}
 	streamName := types.StreamName{Name: receiveEventRequest.StreamName}
