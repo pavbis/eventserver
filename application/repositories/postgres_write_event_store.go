@@ -63,7 +63,7 @@ func (p *postgresWriteEventStore) saveProducerStreamRelation(producerId types.Pr
 		producerId.UUID, streamName.Name)
 }
 
-func (p *postgresWriteEventStore) AcknowledgeEvent (consumerId types.ConsumerId, streamName types.StreamName, eventId types.EventId) string {
+func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, streamName types.StreamName, eventId types.EventId) string {
 	eventName, sequence, err := p.getEventNameAndSequence(streamName, eventId)
 
 	if err != nil {
@@ -91,9 +91,9 @@ func (p *postgresWriteEventStore) AcknowledgeEvent (consumerId types.ConsumerId,
 	return "OK"
 }
 
-func (p *postgresWriteEventStore) getEventNameAndSequence (streamName types.StreamName, eventId types.EventId) (types.EventName, types.Sequence, error) {
+func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.StreamName, eventId types.EventId) (types.EventName, types.Sequence, error) {
 	var eventName types.EventName
-	var sequence  types.Sequence
+	var sequence types.Sequence
 
 	row := p.sqlManager.QueryRow(
 		"SELECT \"eventName\", \"sequence\" FROM \"events\" WHERE \"streamName\" = $1 AND \"eventId\" = $2 LIMIT 1",
@@ -108,7 +108,7 @@ func (p *postgresWriteEventStore) getEventNameAndSequence (streamName types.Stre
 	return eventName, sequence, nil
 }
 
-func (p *postgresWriteEventStore) getConsumerOffset (consumerId types.ConsumerId, streamName types.StreamName, eventName types.EventName) types.ConsumerOffset {
+func (p *postgresWriteEventStore) getConsumerOffset(consumerId types.ConsumerId, streamName types.StreamName, eventName types.EventName) types.ConsumerOffset {
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
