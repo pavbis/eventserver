@@ -1,0 +1,54 @@
+GET /health
+Host: localhost:8000
+
+###
+
+POST /api/v1/streams/test/events
+Host: localhost:8000
+Content-Type: application/json; charset=utf-8
+Accept: application/json; charset=utf-8
+X-Producer-Id: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
+
+{
+  "method" : "RECALCULATE_DOCUMENT",
+  "netGross":"GROSS",
+  "taxFree":true,
+  "reduction":"0",
+  "discountRate":"0",
+  "netGrossChange":false,
+  "documentPositions":[
+    {
+      "taxRate": "19",
+      "taxId": "nineteen",
+      "quantity": "5",
+      "unitPrice": "44.00"
+    },{
+      "taxRate": "7",
+      "taxId": "seven",
+      "quantity": "2",
+      "unitPrice": "91.00"
+    },{
+      "taxRate": "19",
+      "taxId": "nineteen",
+      "quantity": "10",
+      "unitPrice": "88.00"
+    },{
+      "taxRate": "10",
+      "taxId": "ten",
+      "quantity": "2",
+      "unitPrice": "50.00"
+    },{
+      "taxRate": "7",
+      "taxId": "seven",
+      "quantity": "4",
+      "unitPrice": "200.00"
+    },{
+      "taxRate": "19",
+      "taxId": "nineteen",
+      "quantity": "12",
+      "unitPrice": "5.00"
+    }
+  ]
+}
+
+###
