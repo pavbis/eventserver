@@ -12,6 +12,14 @@ import (
 
 var a App
 
+var (
+	dbUser     = "root"
+	dbPassword = "root"
+	dbName     = "testdb"
+	dbHost     = "localhost"
+	dbSSLMode  = "disable"
+)
+
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
 	a.Router.ServeHTTP(rr, req)
@@ -59,7 +67,7 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 
 func TestHealthStatus(t *testing.T) {
 	a = App{}
-	a.Initialize()
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbSSLMode)
 
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	response := executeRequest(req)
@@ -68,12 +76,23 @@ func TestHealthStatus(t *testing.T) {
 	checkMessageValue(t, response.Body.Bytes(), "status", "OK")
 }
 
-func TestCalculateWithEmptyBodyAndInvalidMethod(t *testing.T) {
+func TestReceiveEventWithoutValidHeadersAndAuthorisation(t *testing.T) {
 	a = App{}
-	a.Initialize()
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbSSLMode)
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/streams/test/events", nil)
 	response := executeRequest(req)
 
-	checkResponseCode(t, http.StatusMethodNotAllowed, response.Code)
+	checkResponseCode(t, http.StatusUnauthorized, response.Code)
+}
+
+func TestReceiveEventWithoutValidHeaders(t *testing.T) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbSSLMode)
+
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/streams/test/events", nil)
+	req.Header.Add("Authorization", "Basic dGVzdDp0ZXN0")
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
 }

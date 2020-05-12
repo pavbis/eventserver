@@ -11,6 +11,7 @@ definitions:
         script:
           - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
           - gofmt -d ./
+          - go test -v -cover ./...
         artifacts:
           - ./eventserver
 

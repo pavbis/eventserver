@@ -4,7 +4,7 @@ import (
 	"bitbucket.org/pbisse/eventserver/api/input"
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"bitbucket.org/pbisse/eventserver/application/types"
-	uuid "github.com/google/uuid"
+	"github.com/google/uuid"
 	"net/http"
 )
 
