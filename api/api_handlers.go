@@ -26,15 +26,14 @@ func (a *App) receiveEventRequestHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	event := types.Event{
-		EventId: uuid.New().String(),
+		EventId:   uuid.New().String(),
 		EventName: "Golang",
-		Payload: "{\n   \"foo\":\"bar\"\n}",
+		Payload:   "{\n   \"foo\":\"bar\"\n}",
 	}
 
 	producerId := types.ProducerId{UUID: receiveEventRequest.XProducerId}
 	streamName := types.StreamName{Name: receiveEventRequest.StreamName}
 	eventStore := repositories.NewPostgresWriteEventStore(a.DB)
-
 	result := eventStore.RecordEvent(producerId, streamName, event)
 
 	a.respondWithJSON(w, http.StatusCreated, result)

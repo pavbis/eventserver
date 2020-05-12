@@ -1,0 +1,25 @@
+definitions:
+  services:
+    docker:
+      memory: 2048
+  steps:
+    - step: &eventserver-develop
+        name: run buid
+        image: golang:1.14
+        caches:
+          - node
+        script:
+          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
+          - gofmt -d ./
+        artifacts:
+          - ./eventserver
+
+pipelines:
+  pull-requests:
+    '**':
+      - step: *eventserver-develop
+
+  branches:
+    develop:
+      - step: *eventserver-develop
+
