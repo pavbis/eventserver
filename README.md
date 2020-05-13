@@ -107,13 +107,6 @@ All responses should send the header `Content-Type: application/json; charset=ut
 
 ---
 
-### Authorisation
-
-* Create new read/write route and corresponding request handler.
-* Implement the PreAuthenticatesToken interface in the request handler
-* Now the route can be called with valid credentials (basic auth) only. Otherwise the unauthorized response will be returned. 
-* In case you don't want the route to be secured, just create request handler without implementing the PreAuthenticatesToken interface
-
 ## Local development
 
 ### Bring up the environment
