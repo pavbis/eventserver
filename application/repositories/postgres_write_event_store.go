@@ -34,7 +34,7 @@ func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, strea
 		"VALUES ($1,$2, (SELECT COALESCE(MAX(\"sequence\"),0) FROM \"events\" " +
 		"WHERE \"streamName\" = $3 AND \"eventName\" = $4 LIMIT 1) + 1, $5, $6)"
 
-	_, err = p.sqlManager.Query(query, streamName.Name, event.EventData.Name, streamName.Name, event.EventData.Name, event.EventId, event.ToJSON())
+	_, err = p.sqlManager.Exec(query, streamName.Name, event.EventData.Name, streamName.Name, event.EventData.Name, event.EventId, event.ToJSON())
 
 	if err != nil {
 		return err.Error()
