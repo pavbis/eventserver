@@ -25,7 +25,8 @@ func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
 		return nil, errors.New("missing or invalid consumer id provided")
 	}
 
-	limit, err := strconv.Atoi(r.URL.Query()["limit"][0])
+	params := r.URL.Query()
+	limit, err := strconv.Atoi(params.Get("limit"))
 
 	if err != nil {
 		return nil, errors.New("limit arguments is not valid")
@@ -36,7 +37,7 @@ func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
 		ContentType:       r.Header.Get("Content-Type"),
 		ConsumerId:        consumerId,
 		StreamName:        vars["streamName"],
-		EventName:         r.URL.Query()["eventName"][0],
+		EventName:         params.Get("eventName"),
 		Limit:             limit,
 	}, nil
 }
