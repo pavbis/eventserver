@@ -27,7 +27,11 @@ func (a *App) receiveEventRequestHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	var event types.Event
-	err := json.NewDecoder(r.Body).Decode(&event)
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+
+	err := decoder.Decode(&event)
+
 	if err != nil {
 		a.respondWithError(w, http.StatusBadRequest, err.Error())
 		return
@@ -49,7 +53,12 @@ func (a *App) receiveEventRequestHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (a *App) receiveAcknowledgementRequestHandler(w http.ResponseWriter, r *http.Request) {
-	receiveAcknowledgementRequest := input.NewReceiveAcknowledgementFromRequest(r)
+	receiveAcknowledgementRequest, err := input.NewReceiveAcknowledgementFromRequest(r)
+
+	if err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	if err := a.validate.Struct(receiveAcknowledgementRequest); err != nil {
 		a.respondWithError(w, http.StatusBadRequest, err.Error())

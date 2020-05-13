@@ -70,7 +70,12 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 		return err.Error()
 	}
 
-	consumerOffset := p.getConsumerOffset(consumerId, streamName, eventName)
+	consumerOffset, err := p.getConsumerOffset(consumerId, streamName, eventName)
+
+	if err != nil {
+		return err.Error()
+	}
+
 	nextOffset := consumerOffset.Increment()
 
 	if nextOffset.Offset != sequence.Pointer {
@@ -88,7 +93,7 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 		return err.Error()
 	}
 
-	return "OK"
+	return fmt.Sprintf("Succesfully moved offset to %d for cosumer id %s", nextOffset.Offset, consumerId.UUID.String())
 }
 
 func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.StreamName, eventId types.EventId) (types.EventName, types.Sequence, error) {
@@ -108,14 +113,19 @@ func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.Strea
 	return eventName, sequence, nil
 }
 
-func (p *postgresWriteEventStore) getConsumerOffset(consumerId types.ConsumerId, streamName types.StreamName, eventName types.EventName) types.ConsumerOffset {
+func (p *postgresWriteEventStore) getConsumerOffset(
+	consumerId types.ConsumerId,
+	streamName types.StreamName,
+	eventName types.EventName) (types.ConsumerOffset, error) {
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
 		"SELECT \"offset\" FROM \"consumerOffsets\" WHERE \"consumerId\" = $1 AND \"eventName\" = $2 AND \"streamName\" = $3 LIMIT 1",
-		consumerId.UUID.String(), streamName.Name, eventName.Name)
+		consumerId.UUID.String(), eventName.Name, streamName.Name)
 
-	_ = row.Scan(&consumerOffset.Offset)
+	if err := row.Scan(&consumerOffset.Offset); err != nil {
+		return consumerOffset, err
+	}
 
-	return consumerOffset
+	return consumerOffset, nil
 }
