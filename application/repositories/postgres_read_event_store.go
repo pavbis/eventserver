@@ -13,7 +13,7 @@ func NewPostgresReadEventStore(sqlManger *sql.DB) *postgresReadEventStore {
 	return &postgresReadEventStore{sqlManager: sqlManger}
 }
 
-func (p *postgresReadEventStore) SelectEvents (q types.SelectEventsQuery) ([]*types.Event, error) {
+func (p *postgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*types.Event, error) {
 	consumerOffset, err := p.getConsumerOffset(q.ConsumerId, q.StreamName, q.EventName)
 
 	if err != nil {
@@ -22,7 +22,7 @@ func (p *postgresReadEventStore) SelectEvents (q types.SelectEventsQuery) ([]*ty
 
 	events := make([]*types.Event, 0)
 
-	rows, err := p.sqlManager.Query("SELECT \"sequence\", \"event\" FROM \"events\" " +
+	rows, err := p.sqlManager.Query("SELECT \"sequence\", \"event\" FROM \"events\" "+
 		"WHERE \"streamName\" = $1 AND \"eventName\" = $2 AND \"sequence\" > $3 ORDER BY \"sequence\" LIMIT $4",
 		q.StreamName.Name, q.EventName.Name, consumerOffset.Offset, q.MaxEventCount.Count)
 
@@ -60,6 +60,3 @@ func (p *postgresReadEventStore) getConsumerOffset(
 
 	return consumerOffset, nil
 }
-
-
-

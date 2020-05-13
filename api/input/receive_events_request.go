@@ -11,10 +11,10 @@ import (
 type receiveEvents struct {
 	AcceptContentType string `validate:"required,contentType"`
 	ContentType       string `validate:"required,contentType"`
-	ConsumerId uuid.UUID
-	StreamName        string  `validate:"required"`
-	EventName         string  `validate:"required"`
-	Limit 			  int	  `validate:"required"`
+	ConsumerId        uuid.UUID
+	StreamName        string `validate:"required"`
+	EventName         string `validate:"required"`
+	Limit             int    `validate:"required"`
 }
 
 func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
@@ -33,10 +33,10 @@ func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
 
 	return &receiveEvents{
 		AcceptContentType: r.Header.Get("Accept"),
-		ContentType: r.Header.Get("Content-Type"),
-		ConsumerId: consumerId,
-		StreamName: vars["streamName"],
-		EventName: r.URL.Query()["eventName"][0],
-		Limit: limit,
+		ContentType:       r.Header.Get("Content-Type"),
+		ConsumerId:        consumerId,
+		StreamName:        vars["streamName"],
+		EventName:         r.URL.Query()["eventName"][0],
+		Limit:             limit,
 	}, nil
 }
