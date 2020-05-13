@@ -71,6 +71,9 @@ func (a *App) initializeRoutes() {
 	api.HandleFunc(
 		"/streams/{streamName}/events/{eventId}",
 		basicAuthMiddleware(userName, password, a.receiveAcknowledgementRequestHandler)).Methods(http.MethodPost)
+	api.HandleFunc(
+		"/streams/{streamName}/events",
+		basicAuthMiddleware(userName, password, a.receiveEventsRequestHandler)).Methods(http.MethodGet)
 }
 
 func (a *App) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
