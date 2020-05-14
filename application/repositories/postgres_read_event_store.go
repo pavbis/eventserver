@@ -20,8 +20,14 @@ func (p *postgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*typ
 		return nil, err
 	}
 
-	rows, err := p.sqlManager.Query("SELECT \"eventId\", \"event\" FROM \"events\" "+
-		"WHERE \"streamName\" = $1 AND \"eventName\" = $2 AND \"sequence\" > $3 ORDER BY \"sequence\" LIMIT $4",
+	rows, err := p.sqlManager.Query(
+		`SELECT "eventId", "event" 
+					FROM "events" 
+					WHERE "streamName" = $1 
+				  	AND "eventName" = $2 
+					AND "sequence" > $3 
+					ORDER BY "sequence"
+					LIMIT $4`,
 		q.StreamName.Name, q.EventName.Name, consumerOffset.Offset, q.MaxEventCount.Count)
 
 	if err != nil {
@@ -53,7 +59,12 @@ func (p *postgresReadEventStore) getConsumerOffset(
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
-		"SELECT \"offset\" FROM \"consumerOffsets\" WHERE \"consumerId\" = $1 AND \"eventName\" = $2 AND \"streamName\" = $3 LIMIT 1",
+		`SELECT "offset" 
+				FROM "consumerOffsets" 
+				WHERE "consumerId" = $1 
+				AND "eventName" = $2 
+				AND "streamName" = $3 
+				LIMIT 1`,
 		consumerId.UUID.String(), eventName.Name, streamName.Name)
 
 	if err := row.Scan(&consumerOffset.Offset); err != nil {

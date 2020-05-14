@@ -30,9 +30,8 @@ func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, strea
 		return err.Error()
 	}
 
-	query := "INSERT INTO \"events\" (\"streamName\", \"eventName\", \"sequence\", \"eventId\", \"event\") " +
-		"VALUES ($1,$2, (SELECT COALESCE(MAX(\"sequence\"),0) FROM \"events\" " +
-		"WHERE \"streamName\" = $3 AND \"eventName\" = $4 LIMIT 1) + 1, $5, $6)"
+	query := `INSERT INTO "events" ("streamName", "eventName", "sequence", "eventId", "event")
+			VALUES ($1,$2, (SELECT COALESCE(MAX("sequence"),0) FROM "events" WHERE "streamName" = $3 AND "eventName" = $4 LIMIT 1) + 1, $5, $6)`
 
 	_, err = p.sqlManager.Exec(query, streamName.Name, event.EventData.Name, streamName.Name, event.EventData.Name, event.EventId, event.ToJSON())
 
@@ -47,7 +46,7 @@ func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.St
 	var producerId types.ProducerId
 
 	row := p.sqlManager.QueryRow(
-		"SELECT \"producerId\" FROM \"producerStreamRelations\" WHERE \"streamName\" = $1 LIMIT 1",
+		`SELECT "producerId" FROM "producerStreamRelations" WHERE "streamName" = $1 LIMIT 1`,
 		streamName.Name)
 
 	if err := row.Scan(&producerId.UUID); err != nil {
@@ -59,7 +58,7 @@ func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.St
 
 func (p *postgresWriteEventStore) saveProducerStreamRelation(producerId types.ProducerId, streamName types.StreamName) {
 	_, _ = p.sqlManager.Query(
-		"INSERT INTO \"producerStreamRelations\" (\"producerId\", \"streamName\") VALUES ($1, $2) ON CONFLICT (\"streamName\") DO NOTHING",
+		`INSERT INTO "producerStreamRelations" ("producerId", "streamName") VALUES ($1, $2) ON CONFLICT ("streamName") DO NOTHING`,
 		producerId.UUID, streamName.Name)
 }
 
@@ -83,9 +82,9 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 		return err.Error()
 	}
 
-	query := "INSERT INTO \"consumerOffsets\" (\"consumerId\", \"streamName\", \"eventName\", \"offset\") " +
-		"VALUES ($1, $2, $3, $4) ON CONFLICT (\"consumerId\", \"streamName\", \"eventName\") " +
-		"DO UPDATE SET \"offset\" = EXCLUDED.\"offset\", \"movedAt\" = now()"
+	query := `INSERT INTO "consumerOffsets" ("consumerId", "streamName", "eventName", "offset") 
+				VALUES ($1, $2, $3, $4) ON CONFLICT ("consumerId", "streamName", "eventName") 
+				DO UPDATE SET "offset" = EXCLUDED."offset", "movedAt" = now()`
 
 	_, err = p.sqlManager.Exec(query, consumerId.UUID.String(), streamName.Name, eventName.Name, nextOffset.Offset)
 
@@ -101,7 +100,7 @@ func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.Strea
 	var sequence types.Sequence
 
 	row := p.sqlManager.QueryRow(
-		"SELECT \"eventName\", \"sequence\" FROM \"events\" WHERE \"streamName\" = $1 AND \"eventId\" = $2 LIMIT 1",
+		`SELECT "eventName", "sequence" FROM "events" WHERE "streamName" = $1 AND "eventId" = $2 LIMIT 1`,
 		streamName.Name, eventId.UUID.String())
 
 	if err := row.Scan(&eventName.Name, &sequence.Pointer); err != nil {
@@ -120,7 +119,7 @@ func (p *postgresWriteEventStore) getConsumerOffset(
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
-		"SELECT \"offset\" FROM \"consumerOffsets\" WHERE \"consumerId\" = $1 AND \"eventName\" = $2 AND \"streamName\" = $3 LIMIT 1",
+		`SELECT "offset" FROM "consumerOffsets" WHERE "consumerId" = $1 AND "eventName" = $2 AND "streamName" = $3 LIMIT 1`,
 		consumerId.UUID.String(), eventName.Name, streamName.Name)
 
 	if err := row.Scan(&consumerOffset.Offset); err != nil {
