@@ -1,7 +1,6 @@
 package input
 
 import (
-	"errors"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -20,13 +19,13 @@ func NewReceiveAcknowledgementFromRequest(r *http.Request) (*receiveAcknowledgem
 	consumerId, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))
 
 	if err != nil {
-		return nil, errors.New("missing or invalid consumer id provided")
+		return nil, ErrConsumerId
 	}
 
 	eventId, err := uuid.Parse(vars["eventId"])
 
 	if err != nil {
-		return nil, errors.New("missing or invalid event id provided")
+		return nil, ErrEventId
 	}
 
 	return &receiveAcknowledgement{

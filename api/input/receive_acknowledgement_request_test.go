@@ -1,7 +1,6 @@
 package input
 
 import (
-	"errors"
 	"net/http"
 	"reflect"
 	"testing"
@@ -19,12 +18,12 @@ func TestReceiveAcknowledgementFromRequestErrors(t *testing.T) {
 		{
 			name:           "Test with invalid consumer id",
 			input:          http.Request{},
-			expectedResult: errors.New("missing or invalid consumer id provided"),
+			expectedResult: ErrConsumerId,
 		},
 		{
 			name:           "Test with valid consumer id but invalid event id",
 			input:          http.Request{Header: header},
-			expectedResult: errors.New("missing or invalid event id provided"),
+			expectedResult: ErrEventId,
 		},
 	}
 

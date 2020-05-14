@@ -1,7 +1,6 @@
 package input
 
 import (
-	"errors"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -22,14 +21,14 @@ func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
 	consumerId, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))
 
 	if err != nil {
-		return nil, errors.New("missing or invalid consumer id provided")
+		return nil, ErrConsumerId
 	}
 
 	params := r.URL.Query()
 	limit, err := strconv.Atoi(params.Get("limit"))
 
 	if err != nil {
-		return nil, errors.New("limit arguments is not valid")
+		return nil, ErrLimit
 	}
 
 	return &receiveEvents{
