@@ -72,14 +72,27 @@ func (a *App) initializeRoutes() {
 	api.HandleFunc(
 		"/streams/{streamName}/events",
 		basicAuthMiddleware(userName, password, a.receiveEventsRequestHandler)).Methods(http.MethodGet)
+	// Stats
+	api.HandleFunc(
+		"/stats/events-per-stream",
+		basicAuthMiddleware(userName, password, a.receiveEventsChartDataRequestHandler)).Methods(http.MethodGet)
+	api.HandleFunc(
+		"/stats/stream-data",
+		basicAuthMiddleware(userName, password, a.receiveStreamDataRequestHandler)).Methods(http.MethodGet)
+	api.HandleFunc(
+		"/stats/events-current-month",
+		basicAuthMiddleware(userName, password, a.receiveSEventsForCurrentMonthRequestHandler)).Methods(http.MethodGet)
 }
 
 func (a *App) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
+	a.respond(w, code, response)
+}
 
+func (a *App) respond(w http.ResponseWriter, code int, jsonData []byte) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	_, _ = w.Write(response)
+	_, _ = w.Write(jsonData)
 }
 
 func (a *App) respondWithError(w http.ResponseWriter, code int, message string) {

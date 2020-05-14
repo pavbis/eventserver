@@ -112,3 +112,54 @@ func (a *App) receiveEventsRequestHandler(w http.ResponseWriter, r *http.Request
 
 	a.respondWithJSON(w, http.StatusOK, result)
 }
+
+func (a *App) receiveEventsChartDataRequestHandler(w http.ResponseWriter, r *http.Request) {
+	eventStore := repositories.NewPostgresChartStore(a.DB)
+	chartData, err := eventStore.EventsChartData()
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
+
+	if err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	a.respond(w, http.StatusOK, chartData)
+}
+
+func (a *App) receiveStreamDataRequestHandler(w http.ResponseWriter, r *http.Request) {
+	eventStore := repositories.NewPostgresChartStore(a.DB)
+	chartData, err := eventStore.StreamChartData()
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
+
+	if err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	a.respond(w, http.StatusOK, chartData)
+}
+
+func (a *App) receiveSEventsForCurrentMonthRequestHandler(w http.ResponseWriter, r *http.Request) {
+	eventStore := repositories.NewPostgresChartStore(a.DB)
+	chartData, err := eventStore.EventsForCurrentMonth()
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
+
+	if err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	a.respond(w, http.StatusOK, chartData)
+}

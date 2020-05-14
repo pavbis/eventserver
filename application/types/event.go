@@ -21,14 +21,14 @@ type (
 
 	EventData struct {
 		Name    string `json:"name" validate:"required"`
-		Version int `json:"version"`
+		Version int    `json:"version"`
 	}
 )
 
 type Payload map[string]interface{}
 
 type Event struct {
-	EventId    string `json:"eventId"`
+	EventId   string `json:"eventId"`
 	EventData `json:"event"`
 	System    `json:"system"`
 	Trigger   `json:"trigger"`
