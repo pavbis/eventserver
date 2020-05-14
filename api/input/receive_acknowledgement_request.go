@@ -7,11 +7,9 @@ import (
 )
 
 type receiveAcknowledgement struct {
-	AcceptContentType string    `validate:"required,contentType"`
-	ContentType       string    `validate:"required,contentType"`
-	ConsumerId        uuid.UUID `validate:"required"`
-	StreamName        string    `validate:"required"`
-	EventId           uuid.UUID `validate:"required"`
+	ConsumerId uuid.UUID `validate:"required"`
+	StreamName string    `validate:"required"`
+	EventId    uuid.UUID `validate:"required"`
 }
 
 func NewReceiveAcknowledgementFromRequest(r *http.Request) (*receiveAcknowledgement, error) {
@@ -29,10 +27,8 @@ func NewReceiveAcknowledgementFromRequest(r *http.Request) (*receiveAcknowledgem
 	}
 
 	return &receiveAcknowledgement{
-		AcceptContentType: r.Header.Get("Accept"),
-		ContentType:       r.Header.Get("Content-Type"),
-		ConsumerId:        consumerId,
-		StreamName:        vars["streamName"],
-		EventId:           eventId,
+		ConsumerId: consumerId,
+		StreamName: vars["streamName"],
+		EventId:    eventId,
 	}, nil
 }

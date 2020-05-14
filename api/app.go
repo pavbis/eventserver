@@ -42,7 +42,6 @@ func (a *App) Initialize(user, password, dbname, host, sslmode string) {
 	}
 
 	a.validate = validator.New()
-	a.registerCustomValidators()
 
 	a.Router = mux.NewRouter()
 	a.initializeRoutes()
@@ -53,39 +52,40 @@ func (a *App) Run(addr string) {
 	a.Logger.Fatal(http.ListenAndServe(addr, loggedRouter))
 }
 
-func (a *App) registerCustomValidators() {
-	_ = a.validate.RegisterValidation("contentType", func(fl validator.FieldLevel) bool {
-		return fl.Field().String() == "application/json; charset=utf-8"
-	})
-}
-
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/health", a.healthRequestHandler).Methods(http.MethodGet)
 
 	api := a.Router.PathPrefix("/api/v1").Subrouter()
 	api.HandleFunc(
 		"/streams/{streamName}/events",
-		basicAuthMiddleware(userName, password, a.receiveEventRequestHandler)).Methods(http.MethodPost)
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.receiveEventRequestHandler))).Methods(http.MethodPost)
 	api.HandleFunc(
 		"/streams/{streamName}/events/{eventId}",
-		basicAuthMiddleware(userName, password, a.receiveAcknowledgementRequestHandler)).Methods(http.MethodPost)
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.receiveAcknowledgementRequestHandler))).Methods(http.MethodPost)
 	api.HandleFunc(
 		"/streams/{streamName}/events",
-		basicAuthMiddleware(userName, password, a.receiveEventsRequestHandler)).Methods(http.MethodGet)
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.receiveEventsRequestHandler))).Methods(http.MethodGet)
 	// Stats
 	api.HandleFunc(
 		"/stats/events-per-stream",
-		basicAuthMiddleware(userName, password, a.receiveEventsChartDataRequestHandler)).Methods(http.MethodGet)
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.receiveEventsChartDataRequestHandler))).Methods(http.MethodGet)
 	api.HandleFunc(
 		"/stats/stream-data",
-		basicAuthMiddleware(userName, password, a.receiveStreamDataRequestHandler)).Methods(http.MethodGet)
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.receiveStreamDataRequestHandler))).Methods(http.MethodGet)
 	api.HandleFunc(
 		"/stats/events-current-month",
-		basicAuthMiddleware(userName, password, a.receiveEventsForCurrentMonthRequestHandler)).Methods(http.MethodGet)
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.receiveEventsForCurrentMonthRequestHandler))).Methods(http.MethodGet)
 	//Search
 	api.HandleFunc(
 		"/search",
-		basicAuthMiddleware(userName, password, a.searchRequestHandler)).Methods(http.MethodPost)
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.searchRequestHandler))).Methods(http.MethodPost)
 }
 
 func (a *App) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
