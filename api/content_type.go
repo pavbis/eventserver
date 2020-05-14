@@ -5,6 +5,9 @@ import (
 	"net/http"
 )
 
+var ContentTypeErr = errors.New("Content-Type header must be application/json; charset=utf-8")
+var AcceptErr = errors.New("accept header must be application/json; charset=utf-8")
+
 func contentTypeMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := checkHeaders(r)
@@ -26,12 +29,12 @@ func checkHeaders(r *http.Request) error {
 	forcedContentType := "application/json; charset=utf-8"
 
 	if contentType != forcedContentType {
-		return errors.New("Content-Type header must be application/json; charset=utf-8")
+		return ContentTypeErr
 	}
 
 	accept := r.Header.Get("Accept")
 	if accept != forcedContentType {
-		return errors.New("accept header must be application/json; charset=utf-8")
+		return AcceptErr
 	}
 
 	return nil
