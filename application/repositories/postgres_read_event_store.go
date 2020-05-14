@@ -20,9 +20,7 @@ func (p *postgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*typ
 		return nil, err
 	}
 
-	events := make([]*types.Event, 0)
-
-	rows, err := p.sqlManager.Query("SELECT \"sequence\", \"event\" FROM \"events\" "+
+	rows, err := p.sqlManager.Query("SELECT \"eventId\", \"event\" FROM \"events\" "+
 		"WHERE \"streamName\" = $1 AND \"eventName\" = $2 AND \"sequence\" > $3 ORDER BY \"sequence\" LIMIT $4",
 		q.StreamName.Name, q.EventName.Name, consumerOffset.Offset, q.MaxEventCount.Count)
 
@@ -32,13 +30,16 @@ func (p *postgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*typ
 
 	defer rows.Close()
 
+	events := make([]*types.Event, 0)
+
 	for rows.Next() {
 		event := new(types.Event)
-		var sequence int64
-		if err := rows.Scan(&sequence, &event.Payload); err != nil {
+		var eventId string
+		if err := rows.Scan(&eventId, &event); err != nil {
 			return nil, err
 		}
 
+		event.EventId = eventId
 		events = append(events, event)
 	}
 

@@ -21,31 +21,31 @@ type (
 
 	EventData struct {
 		Name    string `json:"name" validate:"required"`
-		Version string `json:"version"`
+		Version int `json:"version"`
 	}
 )
 
 type Payload map[string]interface{}
 
-func (a Payload) Value() (driver.Value, error) {
-	return json.Marshal(a)
+type Event struct {
+	EventId    string `json:"eventId"`
+	EventData `json:"event"`
+	System    `json:"system"`
+	Trigger   `json:"trigger"`
+	Payload   `json:"payload"`
 }
 
-func (a *Payload) Scan(value interface{}) error {
+func (e Event) Value() (driver.Value, error) {
+	return json.Marshal(e)
+}
+
+func (e *Event) Scan(value interface{}) error {
 	b, ok := value.([]byte)
 	if !ok {
 		return errors.New("type assertion to []byte failed")
 	}
 
-	return json.Unmarshal(b, &a)
-}
-
-type Event struct {
-	EventId   string `json:"-"`
-	EventData `json:"event"`
-	System    `json:"system"`
-	Trigger   `json:"trigger"`
-	Payload   `json:"payload"`
+	return json.Unmarshal(b, &e)
 }
 
 func (e *Event) ToJSON() string {

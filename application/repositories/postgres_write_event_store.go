@@ -72,7 +72,7 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 
 	consumerOffset, err := p.getConsumerOffset(consumerId, streamName, eventName)
 
-	if err != nil {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err.Error()
 	}
 
