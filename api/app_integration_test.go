@@ -83,16 +83,18 @@ func TestReceiveEventWithoutValidHeadersAndAuthorisation(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/streams/test/events", nil)
 	response := executeRequest(req)
 
-	checkResponseCode(t, http.StatusUnauthorized, response.Code)
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
 }
 
-func TestReceiveEventWithoutValidHeaders(t *testing.T) {
+func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
 	a = App{}
 	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbSSLMode)
 
-	req, _ := http.NewRequest(http.MethodPost, "/api/v1/streams/test/events", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/stats/events-per-stream", nil)
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+	req.Header.Add("Accept", "application/json; charset=utf-8")
 	req.Header.Add("Authorization", "Basic dGVzdDp0ZXN0")
 	response := executeRequest(req)
 
-	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkResponseCode(t, http.StatusOK, response.Code)
 }
