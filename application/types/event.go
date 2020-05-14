@@ -1,7 +1,9 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 )
 
 type (
@@ -17,16 +19,29 @@ type (
 		Name string `json:"name"`
 	}
 
-	Payload struct{}
-
 	EventData struct {
 		Name    string `json:"name" validate:"required"`
 		Version string `json:"version"`
 	}
 )
 
+type Payload map[string]interface{}
+
+func (a Payload) Value() (driver.Value, error) {
+	return json.Marshal(a)
+}
+
+func (a *Payload) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
+	}
+
+	return json.Unmarshal(b, &a)
+}
+
 type Event struct {
-	EventId   string
+	EventId   string `json:"-"`
 	EventData `json:"event"`
 	System    `json:"system"`
 	Trigger   `json:"trigger"`

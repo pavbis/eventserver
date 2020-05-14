@@ -34,7 +34,8 @@ func (p *postgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*typ
 
 	for rows.Next() {
 		event := new(types.Event)
-		if err := rows.Scan(&event.Payload); err != nil {
+		var sequence int64
+		if err := rows.Scan(&sequence, &event.Payload); err != nil {
 			return nil, err
 		}
 
