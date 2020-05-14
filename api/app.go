@@ -81,7 +81,11 @@ func (a *App) initializeRoutes() {
 		basicAuthMiddleware(userName, password, a.receiveStreamDataRequestHandler)).Methods(http.MethodGet)
 	api.HandleFunc(
 		"/stats/events-current-month",
-		basicAuthMiddleware(userName, password, a.receiveSEventsForCurrentMonthRequestHandler)).Methods(http.MethodGet)
+		basicAuthMiddleware(userName, password, a.receiveEventsForCurrentMonthRequestHandler)).Methods(http.MethodGet)
+	//Search
+	api.HandleFunc(
+		"/search",
+		basicAuthMiddleware(userName, password, a.searchRequestHandler)).Methods(http.MethodPost)
 }
 
 func (a *App) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {

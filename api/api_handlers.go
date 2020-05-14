@@ -147,7 +147,7 @@ func (a *App) receiveStreamDataRequestHandler(w http.ResponseWriter, r *http.Req
 	a.respond(w, http.StatusOK, chartData)
 }
 
-func (a *App) receiveSEventsForCurrentMonthRequestHandler(w http.ResponseWriter, r *http.Request) {
+func (a *App) receiveEventsForCurrentMonthRequestHandler(w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(a.DB)
 	chartData, err := eventStore.EventsForCurrentMonth()
 
@@ -162,4 +162,30 @@ func (a *App) receiveSEventsForCurrentMonthRequestHandler(w http.ResponseWriter,
 	}
 
 	a.respond(w, http.StatusOK, chartData)
+}
+
+func (a *App) searchRequestHandler(w http.ResponseWriter, r *http.Request) {
+	searchTermRequest := input.NewSearchTermInputFromRequest(r)
+
+	if err := a.validate.Struct(searchTermRequest); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	searchTerm := types.SearchTerm{Term: searchTermRequest.Term}
+	searchEventStore := repositories.NewPostgresSearchStore(a.DB)
+
+	result, err := searchEventStore.SearchResults(searchTerm)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
+
+	if err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	a.respond(w, http.StatusOK, result)
 }
