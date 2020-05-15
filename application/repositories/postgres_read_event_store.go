@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
 	"time"
@@ -110,4 +111,41 @@ func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([
 	}
 
 	return consumers, nil
+}
+
+func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec search.SpecifiesPeriod) ([]*types.EventDescription, error) {
+	rows, err := p.sqlManager.Query(
+		`SELECT 
+				e."eventId",
+				e."eventName",
+				e."createdAt",
+				string_agg(cOF."consumerId", ',') as "consumerIds"
+			FROM events e
+				LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
+				AND e."streamName" = cOF."streamName"
+				AND e."sequence" <= cOF."offset"
+			WHERE e."streamName" = $1 $2
+			GROUP BY e."eventId", e."createdAt", e."eventName"
+			ORDER BY e."createdAt" DESC`,
+		s.Name, spec.AndExpression())
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	eventDescriptions := make([]*types.EventDescription, 0)
+
+	for rows.Next() {
+		var occurredOn time.Time
+		eventDescription := new(types.EventDescription)
+		if err := rows.Scan(&eventDescription.EventId, &occurredOn, eventDescription.EventName, eventDescription.ConsumerIds); err != nil {
+			return nil, err
+		}
+		eventDescription.OccurredOn = types.OccurredOn{Date: occurredOn}
+		eventDescriptions = append(eventDescriptions, eventDescription)
+	}
+
+	return eventDescriptions, nil
 }
