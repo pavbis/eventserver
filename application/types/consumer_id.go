@@ -3,5 +3,5 @@ package types
 import "github.com/google/uuid"
 
 type ConsumerId struct {
-	UUID uuid.UUID
+	UUID uuid.UUID `json:"uuid"`
 }

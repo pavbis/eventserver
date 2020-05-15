@@ -170,6 +170,28 @@ func (a *App) searchRequestHandler(w http.ResponseWriter, r *http.Request) {
 	a.respond(w, http.StatusOK, result)
 }
 
+func (a *App) consumersForStreamRequestHandler(w http.ResponseWriter, r *http.Request) {
+	consumersRequest := input.NewConsumerForStreamInputFromRequest(r)
+
+	if err := a.validate.Struct(consumersRequest); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	streamName := types.StreamName{Name: consumersRequest.StreamName}
+	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
+	result, err := readEventStore.SelectConsumersForStream(streamName)
+
+	a.handleEmptyStorageResult(err, w)
+
+	if err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	a.respondWithJSON(w, http.StatusOK, result)
+}
+
 func (a *App) handleEmptyStorageResult(err error, w http.ResponseWriter) {
 	if errors.Is(err, sql.ErrNoRows) {
 		a.respondWithJSON(w, http.StatusOK, make([]string, 0))

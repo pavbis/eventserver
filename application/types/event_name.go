@@ -1,5 +1,5 @@
 package types
 
 type EventName struct {
-	Name string
+	Name string `json:"name"`
 }

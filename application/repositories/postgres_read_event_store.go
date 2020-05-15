@@ -3,6 +3,7 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
+	"time"
 )
 
 type postgresReadEventStore struct {
@@ -72,4 +73,41 @@ func (p *postgresReadEventStore) getConsumerOffset(
 	}
 
 	return consumerOffset, nil
+}
+
+func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([]*types.ConsumerData, error) {
+	rows, err := p.sqlManager.Query(
+		`SELECT
+			cOF."consumerId",
+			cOF."offset",
+			cOF."movedAt",
+			e."eventName",
+			ROUND(("offset" * 100.0) / COUNT(e."eventId"), 2) AS "consumedPercentage",
+			COUNT(e."eventId") - "offset" AS "behind"
+		FROM "consumerOffsets" cOF
+		INNER JOIN events e USING ("eventName", "streamName")
+		WHERE cOF."streamName" = $1
+		GROUP BY  e."eventName", cOF."offset", cOF."consumerId", cOF."movedAt"`, s.Name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	consumers := make([]*types.ConsumerData, 0)
+
+	for rows.Next() {
+		var occurredOn time.Time
+		var eventName string
+		consumer := new(types.ConsumerData)
+		if err := rows.Scan(&consumer.UUID, &consumer.Offset, &occurredOn, &eventName, &consumer.ConsumedPercentage, &consumer.Behind); err != nil {
+			return nil, err
+		}
+		consumer.OccurredOn = types.OccurredOn{Date: occurredOn}
+		consumer.EventName = types.EventName{Name: eventName}
+		consumers = append(consumers, consumer)
+	}
+
+	return consumers, nil
 }

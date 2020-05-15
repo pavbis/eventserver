@@ -68,6 +68,10 @@ func (a *App) initializeRoutes() {
 		"/streams/{streamName}/events",
 		contentTypeMiddleware(
 			basicAuthMiddleware(userName, password, a.receiveEventsRequestHandler))).Methods(http.MethodGet)
+	api.HandleFunc(
+		"/consumers/{streamName}",
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.consumersForStreamRequestHandler))).Methods(http.MethodGet)
 	// Stats
 	api.HandleFunc(
 		"/stats/events-per-stream",
