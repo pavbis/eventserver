@@ -4,6 +4,7 @@ import (
 	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
+	"strings"
 	"time"
 )
 
@@ -119,15 +120,14 @@ func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec 
 				e."eventId",
 				e."eventName",
 				e."createdAt",
-				string_agg(cOF."consumerId", ',') as "consumerIds"
+				COALESCE(string_agg(cOF."consumerId", ','), '') as "consumerIds"
 			FROM events e
 				LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
 				AND e."streamName" = cOF."streamName"
 				AND e."sequence" <= cOF."offset"
-			WHERE e."streamName" = $1 $2
+			WHERE e."streamName" = $1
 			GROUP BY e."eventId", e."createdAt", e."eventName"
-			ORDER BY e."createdAt" DESC`,
-		s.Name, spec.AndExpression())
+			ORDER BY e."createdAt" DESC`, s.Name)
 
 	if err != nil {
 		return nil, err
@@ -139,11 +139,14 @@ func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec 
 
 	for rows.Next() {
 		var occurredOn time.Time
+		var consumerIds string
 		eventDescription := new(types.EventDescription)
-		if err := rows.Scan(&eventDescription.EventId, &occurredOn, eventDescription.EventName, eventDescription.ConsumerIds); err != nil {
+
+		if err := rows.Scan(&eventDescription.UUID, &eventDescription.EventName.Name, &occurredOn, &consumerIds); err != nil {
 			return nil, err
 		}
 		eventDescription.OccurredOn = types.OccurredOn{Date: occurredOn}
+		eventDescription.ConsumerIds = strings.Split(consumerIds, ",")
 		eventDescriptions = append(eventDescriptions, eventDescription)
 	}
 

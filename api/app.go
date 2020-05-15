@@ -90,6 +90,10 @@ func (a *App) initializeRoutes() {
 		"/search",
 		contentTypeMiddleware(
 			basicAuthMiddleware(userName, password, a.searchRequestHandler))).Methods(http.MethodPost)
+	api.HandleFunc(
+		"/event-period-search/{streamName}",
+		contentTypeMiddleware(
+			basicAuthMiddleware(userName, password, a.eventPeriodSearchRequestHandler))).Methods(http.MethodPost)
 }
 
 func (a *App) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {

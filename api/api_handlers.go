@@ -3,11 +3,13 @@ package api
 import (
 	"bitbucket.org/pbisse/eventserver/api/input"
 	"bitbucket.org/pbisse/eventserver/application/repositories"
+	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -181,6 +183,31 @@ func (a *App) consumersForStreamRequestHandler(w http.ResponseWriter, r *http.Re
 	streamName := types.StreamName{Name: consumersRequest.StreamName}
 	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
 	result, err := readEventStore.SelectConsumersForStream(streamName)
+
+	a.handleEmptyStorageResult(err, w)
+
+	if err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	a.respondWithJSON(w, http.StatusOK, result)
+}
+
+func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Request) {
+	period := types.Period{Value: r.URL.Query().Get("period")}
+	specList := search.SpecList{}
+	spec, err := search.NewSpecRetriever(specList.ListAll()).FindSpec(&period)
+
+	if err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	vars := mux.Vars(r)
+	streamName := types.StreamName{Name: vars["streamName"]}
+	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
+	result, err := readEventStore.SelectEventsForStream(streamName, spec)
 
 	a.handleEmptyStorageResult(err, w)
 
