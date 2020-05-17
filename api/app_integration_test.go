@@ -69,7 +69,7 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 }
 
 func ensureTableExists() {
-	query := readFileContent("docker/postgres/sql/init-tables.sql")
+	query := readFileContent("sql/init-tables.sql")
 
 	if _, err := a.DB.Exec(string(query)); err != nil {
 		log.Fatal(err)
@@ -77,7 +77,7 @@ func ensureTableExists() {
 }
 
 func storeRDBMSFunctions() {
-	query := readFileContent("docker/postgres/sql/functions.sql")
+	query := readFileContent("sql/functions.sql")
 
 	if _, err := a.DB.Exec(string(query)); err != nil {
 		log.Fatal(err)
