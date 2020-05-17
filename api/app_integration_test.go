@@ -62,8 +62,7 @@ CREATE TABLE IF NOT EXISTS "producerStreamRelations"
 );
 
 CREATE UNIQUE INDEX producerstreamrelations_streamname_uindex
-  ON "producerStreamRelations" ("streamName");
-	)`
+  ON "producerStreamRelations" ("streamName");`
 )
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
