@@ -84,12 +84,22 @@ func storeRDBMSFunctions() {
 	readFileAndExecuteQuery("sql/functions.sql")
 }
 
+func applyFixtures() {
+	readFileAndExecuteQuery("sql/fixtures.sql")
+}
+
+func updateEventsDatesToCurrentMonthAndYear() {
+	readFileAndExecuteQuery("sql/updateEventsDates.sql")
+}
+
 func TestMain(m *testing.M) {
 	a = App{}
 	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
 
 	ensureTableExists()
 	storeRDBMSFunctions()
+	applyFixtures()
+	updateEventsDatesToCurrentMonthAndYear()
 
 	code := m.Run()
 	os.Exit(code)
