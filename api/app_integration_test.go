@@ -329,6 +329,43 @@ func TestReceiveEventRequestHandlerWithInvalidProducerIDForReservedStream(t *tes
 		fmt.Sprintf("stream is reserved for another producer %s", testProducerId))
 }
 
+func TestReceiveAcknowledgementRequestHandlerWithMissingConsumerId(t *testing.T) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+
+	receiveEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration/events/2480b859-e08a-4414-9c7d-003bc1a4b555", nil)
+	response := executeRequest(receiveEventReq)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"missing or invalid consumer id provided")
+}
+
+func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+
+	payload := readFileContent("testdata/input/receive_event.json")
+	receiveEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-two/events", bytes.NewBuffer(payload))
+	receiveEventReq.Header.Add("X-Producer-ID",  testProducerId)
+	receiveEventResponse := executeRequest(receiveEventReq)
+
+	var m map[string]interface{}
+	_ = json.Unmarshal(receiveEventResponse.Body.Bytes(), &m)
+	// grab the created event id
+	eventId := m["uuid"]
+
+	req := authRequest(http.MethodPost, fmt.Sprintf("/api/v1/streams/integration-two/events/%s", eventId), nil)
+	req.Header.Add("X-Consumer-ID",  testConsumerId)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+	expected := bytes.NewBufferString(fmt.Sprintf("Succesfully moved offset to 1 for cosumer id %s", testConsumerId))
+	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
+}
+
 func authRequest(method string, url string, body io.Reader) * http.Request {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")

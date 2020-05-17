@@ -66,24 +66,25 @@ func (p *postgresWriteEventStore) saveProducerStreamRelation(producerId types.Pr
 		producerId.UUID, streamName.Name)
 }
 
-func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, streamName types.StreamName, eventId types.EventId) string {
+func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, streamName types.StreamName, eventId types.EventId) (string, error) {
 	eventName, sequence, err := p.getEventNameAndSequence(streamName, eventId)
+	var message string
 
 	if err != nil {
-		return err.Error()
+		return message, err
 	}
 
 	consumerOffset, err := p.getConsumerOffset(consumerId, streamName, eventName)
 
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return err.Error()
+		return message, err
 	}
 
 	nextOffset := consumerOffset.Increment()
 
 	if nextOffset.Offset != sequence.Pointer {
 		err := errors.New(fmt.Sprintf("Consumer offset mismatch: %d->%d", nextOffset.Offset, sequence.Pointer))
-		return err.Error()
+		return message, err
 	}
 
 	query := `INSERT INTO "consumerOffsets" ("consumerId", "streamName", "eventName", "offset") 
@@ -93,10 +94,11 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 	_, err = p.sqlManager.Exec(query, consumerId.UUID.String(), streamName.Name, eventName.Name, nextOffset.Offset)
 
 	if err != nil {
-		return err.Error()
+		return message, err
 	}
 
-	return fmt.Sprintf("Succesfully moved offset to %d for cosumer id %s", nextOffset.Offset, consumerId.UUID.String())
+	return fmt.Sprintf(
+		"Succesfully moved offset to %d for cosumer id %s", nextOffset.Offset, consumerId.UUID.String()), nil
 }
 
 func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.StreamName, eventId types.EventId) (types.EventName, types.Sequence, error) {

@@ -79,7 +79,12 @@ func (a *App) receiveAcknowledgementRequestHandler(w http.ResponseWriter, r *htt
 	eventId := types.EventId{UUID: receiveAcknowledgementRequest.EventId}
 
 	eventStore := repositories.NewPostgresWriteEventStore(a.DB)
-	result := eventStore.AcknowledgeEvent(consumerId, streamName, eventId)
+	result, err := eventStore.AcknowledgeEvent(consumerId, streamName, eventId)
+
+	if err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	a.respondWithJSON(w, http.StatusOK, result)
 }
