@@ -1,7 +1,11 @@
 definitions:
   services:
-    docker:
-      memory: 2048
+    postgres:
+      image: postgres
+      variables:
+        POSTGRES_DB: 'testdb'
+        POSTGRES_USER: 'root'
+        POSTGRES_PASSWORD: 'root'
   steps:
     - step: &eventserver-develop
         name: run buid
@@ -11,6 +15,8 @@ definitions:
         script:
           - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
           - gofmt -d ./
+        services:
+          - postgres
         artifacts:
           - ./eventserver
 
