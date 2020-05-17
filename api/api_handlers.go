@@ -86,7 +86,11 @@ func (a *App) receiveEventsRequestHandler(w http.ResponseWriter, r *http.Request
 
 	eventStore := repositories.NewPostgresReadEventStore(a.DB)
 	result, err := eventStore.SelectEvents(selectEventsQuery)
-	a.handleEmptyStorageResult(err, w)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -99,7 +103,11 @@ func (a *App) receiveEventsRequestHandler(w http.ResponseWriter, r *http.Request
 func (a *App) receiveEventsChartDataRequestHandler(w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(a.DB)
 	chartData, err := eventStore.EventsChartData()
-	a.handleEmptyStorageResult(err, w)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -112,7 +120,11 @@ func (a *App) receiveEventsChartDataRequestHandler(w http.ResponseWriter, r *htt
 func (a *App) receiveStreamDataRequestHandler(w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(a.DB)
 	chartData, err := eventStore.StreamChartData()
-	a.handleEmptyStorageResult(err, w)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -125,7 +137,11 @@ func (a *App) receiveStreamDataRequestHandler(w http.ResponseWriter, r *http.Req
 func (a *App) receiveEventsForCurrentMonthRequestHandler(w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(a.DB)
 	chartData, err := eventStore.EventsForCurrentMonth()
-	a.handleEmptyStorageResult(err, w)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -143,7 +159,11 @@ func (a *App) searchRequestHandler(w http.ResponseWriter, r *http.Request) {
 	searchEventStore := repositories.NewPostgresSearchStore(a.DB)
 
 	result, err := searchEventStore.SearchResults(searchTerm)
-	a.handleEmptyStorageResult(err, w)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -161,7 +181,10 @@ func (a *App) consumersForStreamRequestHandler(w http.ResponseWriter, r *http.Re
 	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
 	result, err := readEventStore.SelectConsumersForStream(streamName)
 
-	a.handleEmptyStorageResult(err, w)
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -186,7 +209,10 @@ func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Req
 	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
 	result, err := readEventStore.SelectEventsForStream(streamName, spec)
 
-	a.handleEmptyStorageResult(err, w)
+	if errors.Is(err, sql.ErrNoRows) {
+		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
+		return
+	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -199,13 +225,6 @@ func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Req
 func (a *App) validateStruct(i interface{}, w http.ResponseWriter) {
 	if err := a.validate.Struct(i); err != nil {
 		a.respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-}
-
-func (a *App) handleEmptyStorageResult(err error, w http.ResponseWriter) {
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
 		return
 	}
 }

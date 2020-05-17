@@ -4,11 +4,18 @@ definitions:
       memory: 2048
   steps:
     - step: &eventserver-develop
+        services:
+          - docker
         name: run buid
         image: golang:1.14
         caches:
+          - docker
           - node
         script:
+          - curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose
+          - chmod +x /usr/local/bin/docker-compose
+          - docker-compose up -d
+          - docker-compose ps
           - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
           - gofmt -d ./
         artifacts:
