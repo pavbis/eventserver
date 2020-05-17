@@ -17,14 +17,14 @@ import (
 var a App
 
 var (
-	dbUser     = os.Getenv("DB_USER")
-	dbPassword = os.Getenv("DB_PASSWORD")
-	dbName     = os.Getenv("DB_NAME")
-	dbHost     = os.Getenv("DB_HOST")
-	dbPort     = os.Getenv("DB_PORT")
-	dbSSLMode  = os.Getenv("DB_SSLMODE")
-	testConsumerId = "2480b859-e08a-4414-9c7d-003bc1a4b555"
-	testProducerId = "52a454e8-a111-4e5c-a715-2e46fedd8c47"
+	dbUser            = os.Getenv("DB_USER")
+	dbPassword        = os.Getenv("DB_PASSWORD")
+	dbName            = os.Getenv("DB_NAME")
+	dbHost            = os.Getenv("DB_HOST")
+	dbPort            = os.Getenv("DB_PORT")
+	dbSSLMode         = os.Getenv("DB_SSLMODE")
+	testConsumerId    = "2480b859-e08a-4414-9c7d-003bc1a4b555"
+	testProducerId    = "52a454e8-a111-4e5c-a715-2e46fedd8c47"
 	invalidProducerID = "52a454e8-a111-4e5c-a715-2e46fedd8c48"
 )
 
@@ -142,7 +142,6 @@ func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
 }
-
 
 func TestReceiveEventsWithoutQueryParametersValidHeaders(t *testing.T) {
 	a = App{}
@@ -307,7 +306,7 @@ func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
 
 	payload := readFileContent("testdata/input/receive_event.json")
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
-	req.Header.Add("X-Producer-ID",  testProducerId)
+	req.Header.Add("X-Producer-ID", testProducerId)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusCreated, response.Code)
@@ -319,7 +318,7 @@ func TestReceiveEventRequestHandlerWithInvalidProducerIDForReservedStream(t *tes
 
 	payload := readFileContent("testdata/input/receive_event.json")
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
-	req.Header.Add("X-Producer-ID",  invalidProducerID)
+	req.Header.Add("X-Producer-ID", invalidProducerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
@@ -349,7 +348,7 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 
 	payload := readFileContent("testdata/input/receive_event.json")
 	receiveEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-two/events", bytes.NewBuffer(payload))
-	receiveEventReq.Header.Add("X-Producer-ID",  testProducerId)
+	receiveEventReq.Header.Add("X-Producer-ID", testProducerId)
 	receiveEventResponse := executeRequest(receiveEventReq)
 
 	var m map[string]interface{}
@@ -358,7 +357,7 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 	eventId := m["uuid"]
 
 	req := authRequest(http.MethodPost, fmt.Sprintf("/api/v1/streams/integration-two/events/%s", eventId), nil)
-	req.Header.Add("X-Consumer-ID",  testConsumerId)
+	req.Header.Add("X-Consumer-ID", testConsumerId)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
@@ -366,7 +365,7 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
 }
 
-func authRequest(method string, url string, body io.Reader) * http.Request {
+func authRequest(method string, url string, body io.Reader) *http.Request {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	req.Header.Add("Accept", "application/json; charset=utf-8")
