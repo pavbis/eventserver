@@ -4,6 +4,7 @@ import (
 	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -115,8 +116,7 @@ func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([
 }
 
 func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec search.SpecifiesPeriod) ([]*types.EventDescription, error) {
-	rows, err := p.sqlManager.Query(
-		`SELECT 
+	query := fmt.Sprintf(`SELECT 
 				e."eventId",
 				e."eventName",
 				e."createdAt",
@@ -125,9 +125,11 @@ func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec 
 				LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
 				AND e."streamName" = cOF."streamName"
 				AND e."sequence" <= cOF."offset"
-			WHERE e."streamName" = $1
+			WHERE e."streamName" = '%s' %s
 			GROUP BY e."eventId", e."createdAt", e."eventName"
-			ORDER BY e."createdAt" DESC`, s.Name)
+			ORDER BY e."createdAt" DESC`, s.Name, spec.AndExpression())
+
+	rows, err := p.sqlManager.Query(query)
 
 	if err != nil {
 		return nil, err

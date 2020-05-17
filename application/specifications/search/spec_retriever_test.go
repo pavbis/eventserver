@@ -55,6 +55,26 @@ func TestSpecRetrieverFindSpec(t *testing.T) {
 			input:          types.Period{Value: "1 month"},
 			expectedResult: LastMonthSpec{},
 		},
+		{
+			name:           "Test with last six hours period",
+			input:          types.Period{Value: "6 hour"},
+			expectedResult: LastSixHoursSpec{},
+		},
+		{
+			name:           "Test with last two days period",
+			input:          types.Period{Value: "2 day"},
+			expectedResult: LastTwoDaysSpec{},
+		},
+		{
+			name:           "Test with last two weeks period",
+			input:          types.Period{Value: "14 day"},
+			expectedResult: LastTwoWeeksSpec{},
+		},
+		{
+			name:           "Test with last week period",
+			input:          types.Period{Value: "7 day"},
+			expectedResult: LastWeeksSpec{},
+		},
 	}
 
 	for _, test := range tests {

@@ -11,5 +11,5 @@ func (l LastDaySpec) IsSatisfiedBy(p *types.Period) bool {
 }
 
 func (l LastDaySpec) AndExpression() string {
-	return `AND "createdAt" >= now() - interval 24 hour`
+	return `AND "createdAt" >= now() - interval '24 hour'`
 }

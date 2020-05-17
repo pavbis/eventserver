@@ -11,5 +11,5 @@ func (l LastMonthSpec) IsSatisfiedBy(p *types.Period) bool {
 }
 
 func (l LastMonthSpec) AndExpression() string {
-	return `AND "createdAt" >= now() - interval 1 month`
+	return `AND "createdAt" >= now() - interval '1 month'`
 }
