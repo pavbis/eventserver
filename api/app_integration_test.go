@@ -99,7 +99,6 @@ func TestMain(m *testing.M) {
 	ensureTableExists()
 	storeRDBMSFunctions()
 	applyFixtures()
-	updateEventsDatesToCurrentMonthAndYear()
 
 	code := m.Run()
 	os.Exit(code)

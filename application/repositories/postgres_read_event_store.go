@@ -40,7 +40,7 @@ func (p *postgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*typ
 
 	defer rows.Close()
 
-	var events []*types.Event
+	events := make([]*types.Event, 0)
 
 	for rows.Next() {
 		event := new(types.Event)
@@ -98,7 +98,7 @@ func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([
 
 	defer rows.Close()
 
-	var consumers []*types.ConsumerData
+	consumers := make([]*types.ConsumerData, 0)
 
 	for rows.Next() {
 		var occurredOn time.Time
@@ -137,7 +137,7 @@ func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec 
 
 	defer rows.Close()
 
-	var eventDescriptions []*types.EventDescription
+	eventDescriptions := make([]*types.EventDescription, 0)
 
 	for rows.Next() {
 		var occurredOn time.Time
