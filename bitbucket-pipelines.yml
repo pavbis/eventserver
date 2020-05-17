@@ -1,3 +1,17 @@
+image: golang:1.14
+pipelines:
+  default:
+    - step:
+        script:
+          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o eventserver .
+          - gofmt -d ./
+          - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
+          - go tool cover -func coverage.log
+        services:
+          - postgres
+        artifacts:
+          - ./eventserver
+
 definitions:
   services:
     postgres:
@@ -6,28 +20,3 @@ definitions:
         POSTGRES_DB: 'testdb'
         POSTGRES_USER: 'root'
         POSTGRES_PASSWORD: 'root'
-  steps:
-    - step: &eventserver-develop
-        services:
-          - postgres
-        name: run buid
-        image: golang:1.14
-        variables:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_SSLMODE: disable
-        script:
-          - gofmt -d ./
-          - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
-          - go tool cover -func coverage.log
-        artifacts:
-          - ./eventserver
-
-pipelines:
-  pull-requests:
-    '**':
-      - step: *eventserver-develop
-
-  branches:
-    develop:
-      - step: *eventserver-develop
