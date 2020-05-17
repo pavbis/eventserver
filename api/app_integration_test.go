@@ -68,20 +68,20 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 	}
 }
 
-func ensureTableExists() {
-	query := readFileContent("sql/init-table.sql")
+func readFileAndExecuteQuery(filePath string) {
+	query := readFileContent(filePath)
 
 	if _, err := a.DB.Exec(string(query)); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func storeRDBMSFunctions() {
-	query := readFileContent("sql/functions.sql")
+func ensureTableExists() {
+	readFileAndExecuteQuery("sql/init-table.sql")
+}
 
-	if _, err := a.DB.Exec(string(query)); err != nil {
-		log.Fatal(err)
-	}
+func storeRDBMSFunctions() {
+	readFileAndExecuteQuery("sql/functions.sql")
 }
 
 func TestMain(m *testing.M) {
