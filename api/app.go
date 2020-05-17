@@ -20,15 +20,15 @@ type App struct {
 	validate *validator.Validate
 }
 
-const (
-	userName = "test"
-	password = "test"
+var (
+	userName = os.Getenv("AUTH_USER")
+	password = os.Getenv("AUTH_PASS")
 )
 
-func (a *App) Initialize(user, password, dbname, host, sslmode string) {
+func (a *App) Initialize(user, password, dbname, host, dbPort, sslmode string) {
 	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
-	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s sslmode=%s", user, password, dbname, host, sslmode)
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s", user, password, dbname, host, dbPort, sslmode)
 
 	var err error
 	a.DB, err = sql.Open("postgres", dsn)

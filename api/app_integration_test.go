@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -13,11 +14,12 @@ import (
 var a App
 
 var (
-	dbUser     = "root"
-	dbPassword = "root"
-	dbName     = "testdb"
-	dbHost     = "localhost"
-	dbSSLMode  = "disable"
+	dbUser     = os.Getenv("DB_USER")
+	dbPassword = os.Getenv("DB_PASSWORD")
+	dbName     = os.Getenv("DB_NAME")
+	dbHost     = os.Getenv("DB_HOST")
+	dbPort     = os.Getenv("DB_PORT")
+	dbSSLMode  = os.Getenv("DB_SSLMODE")
 )
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
@@ -67,7 +69,7 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 
 func TestHealthStatus(t *testing.T) {
 	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbSSLMode)
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
 
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	response := executeRequest(req)
@@ -78,7 +80,7 @@ func TestHealthStatus(t *testing.T) {
 
 func TestReceiveEventWithoutValidHeadersAndAuthorisation(t *testing.T) {
 	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbSSLMode)
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/streams/test/events", nil)
 	response := executeRequest(req)
@@ -88,7 +90,7 @@ func TestReceiveEventWithoutValidHeadersAndAuthorisation(t *testing.T) {
 
 func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
 	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbSSLMode)
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
 
 	req, _ := http.NewRequest(http.MethodGet, "/api/v1/stats/events-per-stream", nil)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")

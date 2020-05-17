@@ -13,6 +13,15 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+    environment:
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: testdb
+      DB_SSLMODE: disable
+      AUTH_USER: test
+      AUTH_PASS: test
 
   postgres:
     image: postgres:12
