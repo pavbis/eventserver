@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -20,6 +21,49 @@ var (
 	dbHost     = os.Getenv("DB_HOST")
 	dbPort     = os.Getenv("DB_PORT")
 	dbSSLMode  = os.Getenv("DB_SSLMODE")
+)
+
+const (
+	tableCreationQuery = `DROP TABLE IF EXISTS "events";
+DROP TABLE IF EXISTS "consumerOffsets";
+DROP TABLE IF EXISTS "producerStreamRelations";
+
+CREATE TABLE IF NOT EXISTS "events"
+(
+  "streamName" varchar(255) not null,
+  "eventName"  varchar(255) not null,
+  "createdAt"  timestamptz  default now(),
+  "sequence"   bigint       not null,
+  "eventId"    char(36)     not null,
+  "event"      jsonb        not null
+);
+
+CREATE UNIQUE INDEX events_streamname_eventname_sequence_eventid_uindex
+  ON events ("streamName", "eventName", sequence, "eventId");
+
+CREATE INDEX events_payload ON events((event->>'payload'));
+
+CREATE TABLE IF NOT EXISTS "consumerOffsets"
+(
+  "consumerId" CHAR(36)     NOT NULL,
+  "streamName" VARCHAR(255) NOT NULL,
+  "eventName"  VARCHAR(255) NOT NULL,
+  "offset"     BIGINT       NOT NULL,
+  "movedAt"    timestamptz  default now()
+);
+
+CREATE UNIQUE INDEX consumeroffsets_consumerid_streamname_eventname_uindex
+  ON "consumerOffsets" ("consumerId", "streamName", "eventName");
+
+CREATE TABLE IF NOT EXISTS "producerStreamRelations"
+(
+  "producerId" CHAR(36)     NOT NULL,
+  "streamName" VARCHAR(255) NOT NULL
+);
+
+CREATE UNIQUE INDEX producerstreamrelations_streamname_uindex
+  ON "producerStreamRelations" ("streamName");
+	)`
 )
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
@@ -65,6 +109,22 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 	if fieldValue != expected {
 		t.Errorf("Expected %v. Got %v", expected, fieldValue)
 	}
+}
+
+func ensureTableExists() {
+	if _, err := a.DB.Exec(tableCreationQuery); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func TestMain(m *testing.M) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+
+	ensureTableExists()
+
+	code := m.Run()
+	os.Exit(code)
 }
 
 func TestHealthStatus(t *testing.T) {
