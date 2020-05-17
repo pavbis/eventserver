@@ -18,6 +18,8 @@ definitions:
           - docker-compose ps
           - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
           - gofmt -d ./
+          - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
+          - go tool cover -func coverage.log
         artifacts:
           - ./eventserver
 
