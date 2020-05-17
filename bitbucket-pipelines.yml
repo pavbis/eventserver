@@ -1,20 +1,19 @@
 definitions:
-  services:
-    docker:
-      memory: 2048
+  postgres:
+    image: postgres
+    variables:
+      POSTGRES_DB: 'testdb'
+      POSTGRES_USER: 'root'
+      POSTGRES_PASSWORD: 'root'
+
   steps:
     - step: &eventserver-develop
-        services:
-          - docker
         name: run buid
         image: golang:1.14
         caches:
-          - docker
           - node
         script:
-          - curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose
-          - chmod +x /usr/local/bin/docker-compose
-          - docker-compose up -d
+          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
           - gofmt -d ./
           - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
           - go tool cover -func coverage.log
