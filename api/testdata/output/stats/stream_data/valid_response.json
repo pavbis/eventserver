@@ -1,0 +1,62 @@
+[
+  {
+    "streamName": "streamOne",
+    "eventsCount": 5,
+    "consumedEvents": 4,
+    "ranking": "✭"
+  },
+  {
+    "streamName": "sandwich",
+    "eventsCount": 199,
+    "consumedEvents": 121,
+    "ranking": "✭✭✭✭✭"
+  },
+  {
+    "streamName": "nina-von-c",
+    "eventsCount": 22,
+    "consumedEvents": 14,
+    "ranking": "✭✭"
+  },
+  {
+    "streamName": "nicowa",
+    "eventsCount": 157,
+    "consumedEvents": 121,
+    "ranking": "✭✭✭✭"
+  },
+  {
+    "streamName": "miracle",
+    "eventsCount": 80,
+    "consumedEvents": 33,
+    "ranking": "✭✭✭"
+  },
+  {
+    "streamName": "mavi",
+    "eventsCount": 175,
+    "consumedEvents": 44,
+    "ranking": "✭✭✭✭✭"
+  },
+  {
+    "streamName": "maerz",
+    "eventsCount": 91,
+    "consumedEvents": 55,
+    "ranking": "✭✭✭✭"
+  },
+  {
+    "streamName": "hatico",
+    "eventsCount": 73,
+    "consumedEvents": 44,
+    "ranking": "✭✭✭"
+  },
+  {
+    "streamName": "codello",
+    "eventsCount": 16,
+    "consumedEvents": 5,
+    "ranking": "✭"
+  },
+  {
+    "streamName": "carl-gross",
+    "eventsCount": 68,
+    "consumedEvents": 23,
+    "ranking": "✭✭"
+  }
+]

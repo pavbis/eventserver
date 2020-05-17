@@ -1,0 +1,157 @@
+[
+  {
+    "date": "2020-05-01",
+    "eventcount": 0,
+    "progress": ""
+  },
+  {
+    "date": "2020-05-02",
+    "eventcount": 25,
+    "progress": "+ 25"
+  },
+  {
+    "date": "2020-05-03",
+    "eventcount": 30,
+    "progress": "+  5"
+  },
+  {
+    "date": "2020-05-04",
+    "eventcount": 23,
+    "progress": "-  7"
+  },
+  {
+    "date": "2020-05-05",
+    "eventcount": 0,
+    "progress": "- 23"
+  },
+  {
+    "date": "2020-05-06",
+    "eventcount": 1,
+    "progress": "+  1"
+  },
+  {
+    "date": "2020-05-07",
+    "eventcount": 36,
+    "progress": "+ 35"
+  },
+  {
+    "date": "2020-05-08",
+    "eventcount": 49,
+    "progress": "+ 13"
+  },
+  {
+    "date": "2020-05-09",
+    "eventcount": 30,
+    "progress": "- 19"
+  },
+  {
+    "date": "2020-05-10",
+    "eventcount": 1,
+    "progress": "- 29"
+  },
+  {
+    "date": "2020-05-11",
+    "eventcount": 35,
+    "progress": "+ 34"
+  },
+  {
+    "date": "2020-05-12",
+    "eventcount": 0,
+    "progress": "- 35"
+  },
+  {
+    "date": "2020-05-13",
+    "eventcount": 17,
+    "progress": "+ 17"
+  },
+  {
+    "date": "2020-05-14",
+    "eventcount": 22,
+    "progress": "+  5"
+  },
+  {
+    "date": "2020-05-15",
+    "eventcount": 3,
+    "progress": "- 19"
+  },
+  {
+    "date": "2020-05-16",
+    "eventcount": 63,
+    "progress": "+ 60"
+  },
+  {
+    "date": "2020-05-17",
+    "eventcount": 29,
+    "progress": "- 34"
+  },
+  {
+    "date": "2020-05-18",
+    "eventcount": 26,
+    "progress": "-  3"
+  },
+  {
+    "date": "2020-05-19",
+    "eventcount": 0,
+    "progress": "- 26"
+  },
+  {
+    "date": "2020-05-20",
+    "eventcount": 20,
+    "progress": "+ 20"
+  },
+  {
+    "date": "2020-05-21",
+    "eventcount": 24,
+    "progress": "+  4"
+  },
+  {
+    "date": "2020-05-22",
+    "eventcount": 34,
+    "progress": "+ 10"
+  },
+  {
+    "date": "2020-05-23",
+    "eventcount": 0,
+    "progress": "- 34"
+  },
+  {
+    "date": "2020-05-24",
+    "eventcount": 74,
+    "progress": "+ 74"
+  },
+  {
+    "date": "2020-05-25",
+    "eventcount": 18,
+    "progress": "- 56"
+  },
+  {
+    "date": "2020-05-26",
+    "eventcount": 20,
+    "progress": "+  2"
+  },
+  {
+    "date": "2020-05-27",
+    "eventcount": 28,
+    "progress": "+  8"
+  },
+  {
+    "date": "2020-05-28",
+    "eventcount": 33,
+    "progress": "+  5"
+  },
+  {
+    "date": "2020-05-29",
+    "eventcount": 46,
+    "progress": "+ 13"
+  },
+  {
+    "date": "2020-05-30",
+    "eventcount": 199,
+    "progress": "+153"
+  },
+  {
+    "date": "2020-05-31",
+    "eventcount": 0,
+    "progress": "-199"
+  }
+]

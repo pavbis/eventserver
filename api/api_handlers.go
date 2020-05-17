@@ -24,7 +24,11 @@ func (a *App) healthRequestHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) receiveEventRequestHandler(w http.ResponseWriter, r *http.Request) {
 	receiveEventRequest := input.NewReceiveEventRequestFromRequest(r)
-	a.validateStruct(receiveEventRequest, w)
+
+	if err := a.validate.Struct(receiveEventRequest); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	var event types.Event
 	decoder := json.NewDecoder(r.Body)
@@ -37,7 +41,11 @@ func (a *App) receiveEventRequestHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	a.validateStruct(event, w)
+	if err := a.validate.Struct(event); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	event.EventId = uuid.New().String()
 
 	producerId := types.ProducerId{UUID: receiveEventRequest.XProducerId}
@@ -56,7 +64,10 @@ func (a *App) receiveAcknowledgementRequestHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
-	a.validateStruct(receiveAcknowledgementRequest, w)
+	if err := a.validate.Struct(receiveAcknowledgementRequest); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	consumerId := types.ConsumerId{UUID: receiveAcknowledgementRequest.ConsumerId}
 	streamName := types.StreamName{Name: receiveAcknowledgementRequest.StreamName}
@@ -75,7 +86,11 @@ func (a *App) receiveEventsRequestHandler(w http.ResponseWriter, r *http.Request
 		a.respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	a.validateStruct(receiveEventsRequest, w)
+
+	if err := a.validate.Struct(receiveEventsRequest); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	selectEventsQuery := types.SelectEventsQuery{
 		ConsumerId:    types.ConsumerId{UUID: receiveEventsRequest.ConsumerId},
@@ -153,7 +168,11 @@ func (a *App) receiveEventsForCurrentMonthRequestHandler(w http.ResponseWriter, 
 
 func (a *App) searchRequestHandler(w http.ResponseWriter, r *http.Request) {
 	searchTermRequest := input.NewSearchTermInputFromRequest(r)
-	a.validateStruct(searchTermRequest, w)
+
+	if err := a.validate.Struct(searchTermRequest); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	searchTerm := types.SearchTerm{Term: searchTermRequest.Term}
 	searchEventStore := repositories.NewPostgresSearchStore(a.DB)
@@ -175,7 +194,11 @@ func (a *App) searchRequestHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) consumersForStreamRequestHandler(w http.ResponseWriter, r *http.Request) {
 	consumersRequest := input.NewConsumerForStreamInputFromRequest(r)
-	a.validateStruct(consumersRequest, w)
+
+	if err := a.validate.Struct(consumersRequest); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	streamName := types.StreamName{Name: consumersRequest.StreamName}
 	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
@@ -200,7 +223,7 @@ func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Req
 	spec, err := search.NewSpecRetriever(specList.ListAll()).FindSpec(&period)
 
 	if err != nil {
-		a.respondWithError(w, http.StatusInternalServerError, err.Error())
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -220,11 +243,4 @@ func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	a.respondWithJSON(w, http.StatusOK, result)
-}
-
-func (a *App) validateStruct(i interface{}, w http.ResponseWriter) {
-	if err := a.validate.Struct(i); err != nil {
-		a.respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
 }

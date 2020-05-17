@@ -1,0 +1,72 @@
+[
+  {
+    "search_result": {
+      "label": "carl-gross/Snickers",
+      "category": "events",
+      "url": "/admin/streams/carl-gross/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "codello/Snickers",
+      "category": "events",
+      "url": "/admin/streams/codello/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "hatico/Snickers",
+      "category": "events",
+      "url": "/admin/streams/hatico/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "maerz/Snickers",
+      "category": "events",
+      "url": "/admin/streams/maerz/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "mavi/Snickers",
+      "category": "events",
+      "url": "/admin/streams/mavi/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "miracle/Snickers",
+      "category": "events",
+      "url": "/admin/streams/miracle/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "nicowa/Snickers",
+      "category": "events",
+      "url": "/admin/streams/nicowa/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "nina-von-c/Snickers",
+      "category": "events",
+      "url": "/admin/streams/nina-von-c/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "sandwich/Snickers",
+      "category": "events",
+      "url": "/admin/streams/sandwich/events?eventName=Snickers"
+    }
+  },
+  {
+    "search_result": {
+      "label": "nicowa",
+      "category": "streams",
+      "url": "/admin/streams/nicowa/events"
+    }
+  }
+]
