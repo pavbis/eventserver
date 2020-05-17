@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -23,6 +24,8 @@ var (
 	dbPort     = os.Getenv("DB_PORT")
 	dbSSLMode  = os.Getenv("DB_SSLMODE")
 	testConsumerId = "2480b859-e08a-4414-9c7d-003bc1a4b555"
+	testProducerId = "52a454e8-a111-4e5c-a715-2e46fedd8c47"
+	invalidProducerID = "52a454e8-a111-4e5c-a715-2e46fedd8c48"
 )
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
@@ -282,6 +285,48 @@ func TestEventPeriodSearchRequestHandlerWithQueryArgument(t *testing.T) {
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
+}
+
+func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+
+	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"Key: 'receiveEventRequest.XProducerId' Error:Field validation for 'XProducerId' failed on the 'required' tag")
+}
+
+func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+
+	payload := readFileContent("testdata/input/receive_event.json")
+	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
+	req.Header.Add("X-Producer-ID",  testProducerId)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusCreated, response.Code)
+}
+
+func TestReceiveEventRequestHandlerWithInvalidProducerIDForReservedStream(t *testing.T) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+
+	payload := readFileContent("testdata/input/receive_event.json")
+	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
+	req.Header.Add("X-Producer-ID",  invalidProducerID)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		fmt.Sprintf("stream is reserved for another producer %s", testProducerId))
 }
 
 func authRequest(method string, url string, body io.Reader) * http.Request {

@@ -51,7 +51,12 @@ func (a *App) receiveEventRequestHandler(w http.ResponseWriter, r *http.Request)
 	producerId := types.ProducerId{UUID: receiveEventRequest.XProducerId}
 	streamName := types.StreamName{Name: receiveEventRequest.StreamName}
 	eventStore := repositories.NewPostgresWriteEventStore(a.DB)
-	result := eventStore.RecordEvent(producerId, streamName, event)
+	result, err := eventStore.RecordEvent(producerId, streamName, event)
+
+	if err != nil {
+		a.respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	a.respondWithJSON(w, http.StatusCreated, result)
 }

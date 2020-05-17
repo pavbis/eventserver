@@ -1,0 +1,17 @@
+{
+  "event": {
+    "name" : "GdriveSync",
+    "version" : 1
+  },
+  "system" : {
+    "id" : "alv123",
+    "name" :"Houston",
+    "time": "2017-09-06 13:58:12",
+    "timezone" : "Europe/Berlin"
+  },
+  "trigger" : {
+    "type": "system",
+    "name": "/path/to/script.go"
+  },
+  "payload" : {"foo": "bar"}
+}

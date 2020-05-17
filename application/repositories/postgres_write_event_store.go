@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 )
 
 type postgresWriteEventStore struct {
@@ -15,9 +16,10 @@ func NewPostgresWriteEventStore(sqlManger *sql.DB) *postgresWriteEventStore {
 	return &postgresWriteEventStore{sqlManager: sqlManger}
 }
 
-func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, streamName types.StreamName, event types.Event) string {
+func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, streamName types.StreamName, event types.Event) (types.EventId, error) {
 	relatedProducerId := p.getProducerIdForStreamName(streamName)
 
+	var eventId types.EventId
 	var err error
 
 	if relatedProducerId.UUID == "" {
@@ -27,7 +29,7 @@ func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, strea
 
 	if relatedProducerId.UUID != producerId.UUID {
 		err := errors.New(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerId.UUID))
-		return err.Error()
+		return eventId, err
 	}
 
 	query := `INSERT INTO "events" ("streamName", "eventName", "sequence", "eventId", "event")
@@ -36,10 +38,12 @@ func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, strea
 	_, err = p.sqlManager.Exec(query, streamName.Name, event.EventData.Name, streamName.Name, event.EventData.Name, event.EventId, event.ToJSON())
 
 	if err != nil {
-		return err.Error()
+		return eventId, err
 	}
 
-	return event.EventId
+	validUuid, _ := uuid.Parse(event.EventId)
+
+	return types.EventId{UUID: validUuid}, nil
 }
 
 func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.StreamName) types.ProducerId {
