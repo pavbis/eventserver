@@ -12,6 +12,8 @@ definitions:
           - postgres
         name: run buid
         image: golang:1.14
+        variables:
+          DB_PORT: 5432
         script:
           - gofmt -d ./
           - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
