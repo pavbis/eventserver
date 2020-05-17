@@ -1,22 +1,24 @@
-image: golang:1.14
-pipelines:
-  default:
-    - step:
+definitions:
+  services:
+    docker:
+      memory: 2048
+  steps:
+    - step: &eventserver-develop
+        name: run buid
+        image: golang:1.14
+        caches:
+          - node
         script:
-          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o eventserver .
+          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
           - gofmt -d ./
-          - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
-          - go tool cover -func coverage.log
-        services:
-          - postgres
         artifacts:
           - ./eventserver
 
-definitions:
-  services:
-    postgres:
-      image: postgres
-      variables:
-        POSTGRES_DB: 'testdb'
-        POSTGRES_USER: 'root'
-        POSTGRES_PASSWORD: 'root'
+pipelines:
+  pull-requests:
+    '**':
+      - step: *eventserver-develop
+
+  branches:
+    develop:
+      - step: *eventserver-develop
