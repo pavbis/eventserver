@@ -69,7 +69,7 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 }
 
 func ensureTableExists() {
-	query := readFileContent("sql/init-tables.sql")
+	query := readFileContent("sql/init-table.sql")
 
 	if _, err := a.DB.Exec(string(query)); err != nil {
 		log.Fatal(err)
