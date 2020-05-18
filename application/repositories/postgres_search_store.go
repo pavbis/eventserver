@@ -3,6 +3,7 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
+	"strings"
 )
 
 type postgresSearchStore struct {
@@ -21,6 +22,10 @@ func (s *postgresSearchStore) SearchResults(st types.SearchTerm) ([]byte, error)
 
 	if err := row.Scan(&jsonResponse); err != nil {
 		return nil, err
+	}
+
+	if len(strings.TrimSpace(string(jsonResponse))) == 0 {
+		return []byte("[]"), nil
 	}
 
 	return jsonResponse, nil

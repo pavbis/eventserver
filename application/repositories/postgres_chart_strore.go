@@ -1,6 +1,9 @@
 package repositories
 
-import "database/sql"
+import (
+	"database/sql"
+	"strings"
+)
 
 type postgresChartStore struct {
 	sqlManager *sql.DB
@@ -33,6 +36,10 @@ func (c *postgresChartStore) handleRDBMSResult(r *sql.Row) ([]byte, error) {
 
 	if err := r.Scan(&jsonResponse); err != nil {
 		return nil, err
+	}
+
+	if len(strings.TrimSpace(string(jsonResponse))) == 0 {
+		return []byte("[]"), nil
 	}
 
 	return jsonResponse, nil
