@@ -87,11 +87,10 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 		return message, err
 	}
 
-	query := `INSERT INTO "consumerOffsets" ("consumerId", "streamName", "eventName", "offset") 
+	_, err = p.sqlManager.Exec(`INSERT INTO "consumerOffsets" ("consumerId", "streamName", "eventName", "offset") 
 				VALUES ($1, $2, $3, $4) ON CONFLICT ("consumerId", "streamName", "eventName") 
-				DO UPDATE SET "offset" = EXCLUDED."offset", "movedAt" = now()`
-
-	_, err = p.sqlManager.Exec(query, consumerId.UUID.String(), streamName.Name, eventName.Name, nextOffset.Offset)
+				DO UPDATE SET "offset" = EXCLUDED."offset", "movedAt" = now()`,
+		consumerId.UUID.String(), streamName.Name, eventName.Name, nextOffset.Offset)
 
 	if err != nil {
 		return message, err
