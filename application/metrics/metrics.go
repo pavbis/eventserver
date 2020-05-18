@@ -12,3 +12,12 @@ func newStreamsMetric() *prometheus.Desc {
 		nil,
 	)
 }
+
+func newEventsInStreamMetric() *prometheus.Desc {
+	return prometheus.NewDesc(
+		prometheus.BuildFQName(basename, "", "events"),
+		"Total amount of events per stream",
+		[]string{"producerId", "stream"},
+		nil,
+	)
+}

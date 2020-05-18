@@ -44,7 +44,7 @@ func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals
 
 	for rows.Next() {
 		streamTotal := new(types.StreamTotals)
-		if err := rows.Scan(&streamTotal.StreamName, &streamTotal.ProducerId.UUID, &streamTotal.EventCount); err != nil {
+		if err := rows.Scan(&streamTotal.StreamName.Name, &streamTotal.ProducerId.UUID, &streamTotal.EventCount); err != nil {
 			return nil, err
 		}
 
