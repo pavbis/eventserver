@@ -1,9 +1,13 @@
 package api
 
 import (
+	"bitbucket.org/pbisse/eventserver/application/metrics"
+	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
@@ -94,6 +98,14 @@ func (a *App) initializeRoutes() {
 		"/event-period-search/{streamName}",
 		contentTypeMiddleware(
 			basicAuthMiddleware(userName, password, a.eventPeriodSearchRequestHandler))).Methods(http.MethodPost)
+	//Metrics
+	metricsStorage := repositories.NewPostgresMetricsStore(a.DB)
+	metricsCollector := metrics.NewOpenMetricsCollector(metricsStorage)
+
+	registry := prometheus.NewRegistry()
+	registry.MustRegister(metricsCollector)
+
+	api.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 }
 
 func (a *App) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
