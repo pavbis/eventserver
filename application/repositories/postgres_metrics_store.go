@@ -53,3 +53,55 @@ func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals
 
 	return streamTotals, nil
 }
+
+func (p *postgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, error) {
+	rows, err := p.sqlManager.Query(`SELECT
+                    cOF."streamName",
+                    COALESCE(COUNT(DISTINCT cOF."consumerId"), 0) as "countConsumer"
+                FROM "consumerOffsets" cOF
+                GROUP BY cOF."streamName"`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var consumerTotals = make([]*types.ConsumerTotals, 0)
+
+	for rows.Next() {
+		consumerTotal := new(types.ConsumerTotals)
+		if err := rows.Scan(&consumerTotal.StreamName.Name, &consumerTotal.ConsumerCount); err != nil {
+			return nil, err
+		}
+
+		consumerTotals = append(consumerTotals, consumerTotal)
+	}
+
+	return consumerTotals, nil
+}
+
+func (p *postgresMetricsStore) ConsumersOffsets() ([]*types.ConsumerOffsetData, error) {
+	rows, err := p.sqlManager.Query(`SELECT
+                cOF."consumerId",
+                cOF."streamName",
+                cOF."offset",
+                cOF."eventName"
+            FROM "consumerOffsets" cOF 
+            ORDER BY "streamName"`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var consumerOffsetData = make([]*types.ConsumerOffsetData, 0)
+
+	for rows.Next() {
+		consumer := new(types.ConsumerOffsetData)
+		if err := rows.Scan(&consumer.ConsumerId.UUID, &consumer.StreamName.Name, &consumer.ConsumerOffset, &consumer.EventName.Name); err != nil {
+			return nil, err
+		}
+
+		consumerOffsetData = append(consumerOffsetData, consumer)
+	}
+
+	return consumerOffsetData, nil
+}

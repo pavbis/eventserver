@@ -310,6 +310,16 @@ func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T
 		"Consumer offset mismatch: 1->2")
 }
 
+func TestMetricsEndPoint(t *testing.T) {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/metrics", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+}
+
 func authRequest(method string, url string, body io.Reader) *http.Request {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
