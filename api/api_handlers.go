@@ -129,11 +129,6 @@ func (a *App) receiveEventsChartDataRequestHandler(w http.ResponseWriter, r *htt
 	eventStore := repositories.NewPostgresChartStore(a.DB)
 	chartData, err := eventStore.EventsChartData()
 
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
-		return
-	}
-
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -146,11 +141,6 @@ func (a *App) receiveStreamDataRequestHandler(w http.ResponseWriter, r *http.Req
 	eventStore := repositories.NewPostgresChartStore(a.DB)
 	chartData, err := eventStore.StreamChartData()
 
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
-		return
-	}
-
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -162,11 +152,6 @@ func (a *App) receiveStreamDataRequestHandler(w http.ResponseWriter, r *http.Req
 func (a *App) receiveEventsForCurrentMonthRequestHandler(w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(a.DB)
 	chartData, err := eventStore.EventsForCurrentMonth()
-
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
-		return
-	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -186,13 +171,7 @@ func (a *App) searchRequestHandler(w http.ResponseWriter, r *http.Request) {
 
 	searchTerm := types.SearchTerm{Term: searchTermRequest.Term}
 	searchEventStore := repositories.NewPostgresSearchStore(a.DB)
-
 	result, err := searchEventStore.SearchResults(searchTerm)
-
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
-		return
-	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -213,11 +192,6 @@ func (a *App) consumersForStreamRequestHandler(w http.ResponseWriter, r *http.Re
 	streamName := types.StreamName{Name: consumersRequest.StreamName}
 	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
 	result, err := readEventStore.SelectConsumersForStream(streamName)
-
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
-		return
-	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -241,11 +215,6 @@ func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Req
 	streamName := types.StreamName{Name: vars["streamName"]}
 	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
 	result, err := readEventStore.SelectEventsForStream(streamName, spec)
-
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
-		return
-	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())

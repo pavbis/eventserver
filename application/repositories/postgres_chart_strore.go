@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"strings"
 )
 
 type postgresChartStore struct {
@@ -14,13 +13,13 @@ func NewPostgresChartStore(sqlManger *sql.DB) *postgresChartStore {
 }
 
 func (c *postgresChartStore) EventsChartData() ([]byte, error) {
-	row := c.sqlManager.QueryRow(`SELECT stream_chart_data()`)
+	row := c.sqlManager.QueryRow(`SELECT COALESCE(stream_chart_data(), '[]')`)
 
 	return c.handleRDBMSResult(row)
 }
 
 func (c *postgresChartStore) StreamChartData() ([]byte, error) {
-	row := c.sqlManager.QueryRow(`SELECT stream_stats_data()`)
+	row := c.sqlManager.QueryRow(`SELECT COALESCE(stream_stats_data(), '[]')`)
 
 	return c.handleRDBMSResult(row)
 }
@@ -36,10 +35,6 @@ func (c *postgresChartStore) handleRDBMSResult(r *sql.Row) ([]byte, error) {
 
 	if err := r.Scan(&jsonResponse); err != nil {
 		return nil, err
-	}
-
-	if len(strings.TrimSpace(string(jsonResponse))) == 0 {
-		return []byte("[]"), nil
 	}
 
 	return jsonResponse, nil
