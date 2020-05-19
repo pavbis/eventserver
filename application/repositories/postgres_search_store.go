@@ -16,7 +16,7 @@ func NewPostgresSearchStore(sqlManger *sql.DB) *postgresSearchStore {
 
 func (s *postgresSearchStore) SearchResults(st types.SearchTerm) ([]byte, error) {
 	row := s.sqlManager.QueryRow(
-		"SELECT json_agg(json_strip_nulls(row_to_json(t)))FROM (SELECT search_results($1) as search_result) t", st.Term)
+		`SELECT json_agg(t)FROM (SELECT search_results($1) as search_result) t`, st.Term)
 
 	var jsonResponse []byte
 

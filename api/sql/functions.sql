@@ -27,7 +27,7 @@ WITH number_of_events as
  ORDER BY pSR."streamName" DESC
 )
 
-SELECT json_agg(json_strip_nulls(row_to_json(q)))
+SELECT json_agg(q)
 FROM (
      SELECT
          "streamName",
@@ -51,7 +51,7 @@ CREATE OR REPLACE FUNCTION stream_chart_data() RETURNS json
     LANGUAGE SQL
 as
 $$
-SELECT json_agg(json_strip_nulls(row_to_json(q)))
+SELECT json_agg(q)
 FROM (
     SELECT
         pSR."streamName" as label,
@@ -89,7 +89,7 @@ WITH events_per_day AS (
     ORDER BY calendar.entry
 )
 
-SELECT json_agg(json_strip_nulls(row_to_json(t)))
+SELECT json_agg(t)
 FROM (
     SELECT date, eventCount,
     CASE
