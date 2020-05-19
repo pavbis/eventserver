@@ -63,12 +63,12 @@ func (p *postgresReadEventStore) getConsumerOffset(
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
-		`SELECT "offset" 
+		`SELECT COALESCE((SELECT "offset" 
 				FROM "consumerOffsets" 
 				WHERE "consumerId" = $1 
 				AND "eventName" = $2 
 				AND "streamName" = $3 
-				LIMIT 1`,
+				LIMIT 1), 0)`,
 		consumerId.UUID.String(), eventName.Name, streamName.Name)
 
 	if err := row.Scan(&consumerOffset.Offset); err != nil {

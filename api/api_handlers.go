@@ -5,9 +5,7 @@ import (
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -111,11 +109,6 @@ func (a *App) receiveEventsRequestHandler(w http.ResponseWriter, r *http.Request
 
 	eventStore := repositories.NewPostgresReadEventStore(a.DB)
 	result, err := eventStore.SelectEvents(selectEventsQuery)
-
-	if errors.Is(err, sql.ErrNoRows) {
-		a.respondWithJSON(w, http.StatusOK, make([]string, 0))
-		return
-	}
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
