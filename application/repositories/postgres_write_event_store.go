@@ -76,7 +76,7 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 
 	consumerOffset, err := p.getConsumerOffset(consumerId, streamName, eventName)
 
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err != nil {
 		return message, err
 	}
 
@@ -124,7 +124,7 @@ func (p *postgresWriteEventStore) getConsumerOffset(
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
-		`SELECT "offset" FROM "consumerOffsets" WHERE "consumerId" = $1 AND "eventName" = $2 AND "streamName" = $3 LIMIT 1`,
+		`SELECT COALESCE((SELECT "offset" FROM "consumerOffsets" WHERE "consumerId" = $1 AND "eventName" = $2 AND "streamName" = $3 LIMIT 1), 0)`,
 		consumerId.UUID.String(), eventName.Name, streamName.Name)
 
 	if err := row.Scan(&consumerOffset.Offset); err != nil {
