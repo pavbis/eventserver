@@ -78,45 +78,32 @@ func (p *postgresReadEventStore) getConsumerOffset(
 	return consumerOffset, nil
 }
 
-func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([]*types.ConsumerData, error) {
-	rows, err := p.sqlManager.Query(
-		`SELECT
-			cOF."consumerId",
-			cOF."offset",
-			cOF."movedAt",
-			e."eventName",
-			ROUND(("offset" * 100.0) / COUNT(e."eventId"), 2) AS "consumedPercentage",
-			COUNT(e."eventId") - "offset" AS "behind"
-		FROM "consumerOffsets" cOF
-		INNER JOIN events e USING ("eventName", "streamName")
-		WHERE cOF."streamName" = $1
-		GROUP BY  e."eventName", cOF."offset", cOF."consumerId", cOF."movedAt"`, s.Name)
+func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([]byte, error) {
+	row := p.sqlManager.QueryRow(
+		`SELECT COALESCE(
+		(SELECT json_agg(c) FROM (
+			SELECT
+				cOF."consumerId",
+				cOF."offset",
+				cOF."movedAt",
+				e."eventName",
+				ROUND(("offset" * 100.0) / COUNT(e."eventId"), 2) AS "consumedPercentage",
+				COUNT(e."eventId") - "offset" AS "behind"
+			FROM "consumerOffsets" cOF
+		  		INNER JOIN events e USING ("eventName", "streamName")
+			WHERE cOF."streamName" = $1
+			GROUP BY  e."eventName", cOF."offset", cOF."consumerId", cOF."movedAt"
+			)
+		c),
+		'[]'
+)`, s.Name)
 
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	consumers := make([]*types.ConsumerData, 0)
-
-	for rows.Next() {
-		var occurredOn time.Time
-		var eventName string
-		consumer := new(types.ConsumerData)
-		if err := rows.Scan(&consumer.UUID, &consumer.Offset, &occurredOn, &eventName, &consumer.ConsumedPercentage, &consumer.Behind); err != nil {
-			return nil, err
-		}
-		consumer.OccurredOn = types.OccurredOn{Date: occurredOn}
-		consumer.EventName = types.EventName{Name: eventName}
-		consumers = append(consumers, consumer)
-	}
-
-	return consumers, nil
+	return p.handleRDBMSResult(row)
 }
 
 func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec search.SpecifiesPeriod) ([]*types.EventDescription, error) {
-	query := fmt.Sprintf(`SELECT 
+	query := fmt.Sprintf(`
+			SELECT 
 				e."eventId",
 				e."eventName",
 				e."createdAt",
@@ -153,4 +140,14 @@ func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec 
 	}
 
 	return eventDescriptions, nil
+}
+
+func (p *postgresReadEventStore) handleRDBMSResult(r *sql.Row) ([]byte, error) {
+	var jsonResponse []byte
+
+	if err := r.Scan(&jsonResponse); err != nil {
+		return nil, err
+	}
+
+	return jsonResponse, nil
 }

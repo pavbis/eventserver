@@ -191,7 +191,7 @@ func (a *App) consumersForStreamRequestHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	a.respondWithJSON(w, http.StatusOK, result)
+	a.respond(w, http.StatusOK, result)
 }
 
 func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Request) {
