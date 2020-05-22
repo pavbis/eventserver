@@ -26,6 +26,11 @@ var (
 	invalidProducerID = "52a454e8-a111-4e5c-a715-2e46fedd8c48"
 )
 
+func initializeApp() {
+	a = App{}
+	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+}
+
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
 	a.Router.ServeHTTP(rr, req)

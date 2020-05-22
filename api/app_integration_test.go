@@ -12,9 +12,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
+	initializeApp()
 	ensureTableExists()
 	storeRDBMSFunctions()
 	applyFixtures()
@@ -25,9 +23,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestHealthStatus(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	response := executeRequest(req)
 
@@ -36,9 +31,6 @@ func TestHealthStatus(t *testing.T) {
 }
 
 func TestReceiveEventWithoutValidHeadersAndAuthorisation(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/streams/test/events", nil)
 	response := executeRequest(req)
 
@@ -46,9 +38,6 @@ func TestReceiveEventWithoutValidHeadersAndAuthorisation(t *testing.T) {
 }
 
 func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/stats/events-per-stream", nil)
 	response := executeRequest(req)
 	expected := readFileContent("testdata/output/stats/events_per_stream/valid_response.json")
@@ -58,9 +47,6 @@ func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
 }
 
 func TestReceiveEventsWithoutQueryParametersValidHeaders(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/streams/mavi/events", nil)
 	req.Header.Add("X-Consumer-ID", testConsumerId)
 	response := executeRequest(req)
@@ -73,9 +59,6 @@ func TestReceiveEventsWithoutQueryParametersValidHeaders(t *testing.T) {
 }
 
 func TestReceiveEventsWithoutEventNameQueryParameter(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/streams/mavi/events?limit=10", nil)
 	req.Header.Add("X-Consumer-ID", testConsumerId)
 	response := executeRequest(req)
@@ -88,9 +71,6 @@ func TestReceiveEventsWithoutEventNameQueryParameter(t *testing.T) {
 }
 
 func TestReceiveEventsWithValidParameters(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/streams/mavi/events?limit=10&eventName=Snickers", nil)
 	req.Header.Add("X-Consumer-ID", testConsumerId)
 	response := executeRequest(req)
@@ -101,9 +81,6 @@ func TestReceiveEventsWithValidParameters(t *testing.T) {
 }
 
 func TestReceiveEventsWithValidParametersReturnsEmptyResult(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/streams/void/events?limit=10&eventName=Snickers", nil)
 	req.Header.Add("X-Consumer-ID", testConsumerId)
 	response := executeRequest(req)
@@ -113,9 +90,6 @@ func TestReceiveEventsWithValidParametersReturnsEmptyResult(t *testing.T) {
 }
 
 func TestConsumersForStreamRequestHandler(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/consumers/nicowa", nil)
 	response := executeRequest(req)
 	expected := readFileContent("testdata/output/consumers_for_stream/valid_response.json")
@@ -125,9 +99,6 @@ func TestConsumersForStreamRequestHandler(t *testing.T) {
 }
 
 func TestReceiveStreamDataRequestHandler(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/stats/stream-data", nil)
 	response := executeRequest(req)
 	expected := readFileContent("testdata/output/stats/stream_data/valid_response.json")
@@ -137,9 +108,6 @@ func TestReceiveStreamDataRequestHandler(t *testing.T) {
 }
 
 func TestEventsForCurrentMonthRequestHandler(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodGet, "/api/v1/stats/events-current-month", nil)
 	response := executeRequest(req)
 	expected := readFileContent("testdata/output/stats/events_current_month/valid_response.json")
@@ -149,9 +117,6 @@ func TestEventsForCurrentMonthRequestHandler(t *testing.T) {
 }
 
 func TestSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodPost, "/api/v1/search", nil)
 	response := executeRequest(req)
 
@@ -163,9 +128,6 @@ func TestSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 }
 
 func TestSearchRequestHandlerWithQueryArgument(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodPost, "/api/v1/search?_q=nic", nil)
 	response := executeRequest(req)
 	expected := readFileContent("testdata/output/search/valid_response.json")
@@ -175,9 +137,6 @@ func TestSearchRequestHandlerWithQueryArgument(t *testing.T) {
 }
 
 func TestEventPeriodSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodPost, "/api/v1/event-period-search/nicowa", nil)
 	response := executeRequest(req)
 
@@ -189,9 +148,6 @@ func TestEventPeriodSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 }
 
 func TestEventPeriodSearchRequestHandlerWithQueryArgument(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodPost, "/api/v1/event-period-search/maerz?period=6 hour", nil)
 	response := executeRequest(req)
 	expected := readFileContent("testdata/output/search/event_period/valid_response.json")
@@ -201,9 +157,6 @@ func TestEventPeriodSearchRequestHandlerWithQueryArgument(t *testing.T) {
 }
 
 func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", nil)
 	response := executeRequest(req)
 
@@ -215,9 +168,6 @@ func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {
 }
 
 func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	payload := readFileContent("testdata/input/receive_event.json")
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
 	req.Header.Add("X-Producer-ID", testProducerId)
@@ -227,9 +177,6 @@ func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
 }
 
 func TestReceiveEventRequestHandlerWithInvalidProducerIDForReservedStream(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	payload := readFileContent("testdata/input/receive_event.json")
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
 	req.Header.Add("X-Producer-ID", invalidProducerID)
@@ -243,9 +190,6 @@ func TestReceiveEventRequestHandlerWithInvalidProducerIDForReservedStream(t *tes
 }
 
 func TestReceiveAcknowledgementRequestHandlerWithMissingConsumerId(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	receiveEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration/events/2480b859-e08a-4414-9c7d-003bc1a4b555", nil)
 	response := executeRequest(receiveEventReq)
 
@@ -257,9 +201,6 @@ func TestReceiveAcknowledgementRequestHandlerWithMissingConsumerId(t *testing.T)
 }
 
 func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	payload := readFileContent("testdata/input/receive_event.json")
 	receiveEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-two/events", bytes.NewBuffer(payload))
 	receiveEventReq.Header.Add("X-Producer-ID", testProducerId)
@@ -280,9 +221,6 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 }
 
 func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	payload := readFileContent("testdata/input/receive_event.json")
 	receiveFirstEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-three/events", bytes.NewBuffer(payload))
 	receiveFirstEventReq.Header.Add("X-Producer-ID", testProducerId)
@@ -311,9 +249,6 @@ func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T
 }
 
 func TestMetricsEndPoint(t *testing.T) {
-	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
-
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/metrics", nil)
 	response := executeRequest(req)
 
