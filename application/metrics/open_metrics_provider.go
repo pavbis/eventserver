@@ -7,7 +7,7 @@ import (
 )
 
 type openMetricsCollector struct {
-	MetricsStorage    repositories.MetricsData
+	metricsStorage    repositories.MetricsData
 	streams           *prometheus.Desc
 	eventsInStream    *prometheus.Desc
 	consumersInStream *prometheus.Desc
@@ -18,7 +18,7 @@ type openMetricsCollector struct {
 
 func NewOpenMetricsCollector(s repositories.MetricsData) *openMetricsCollector {
 	return &openMetricsCollector{
-		MetricsStorage:    s,
+		metricsStorage:    s,
 		streams:           newStreamsMetric(),
 		eventsInStream:    newEventsInStreamMetric(),
 		consumersInStream: newConsumersInStreamMetric(),
@@ -37,10 +37,10 @@ func (o *openMetricsCollector) Collect(channel chan<- prometheus.Metric) {
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
 
-	streamsTotal, err := o.MetricsStorage.StreamsTotal()
-	eventsInStream, err := o.MetricsStorage.EventsInStreamsWithOwner()
-	consumersInStream, err := o.MetricsStorage.ConsumersInStream()
-	consumersOffsets, err := o.MetricsStorage.ConsumersOffsets()
+	streamsTotal, err := o.metricsStorage.StreamsTotal()
+	eventsInStream, err := o.metricsStorage.EventsInStreamsWithOwner()
+	consumersInStream, err := o.metricsStorage.ConsumersInStream()
+	consumersOffsets, err := o.metricsStorage.ConsumersOffsets()
 
 	if err != nil {
 		return

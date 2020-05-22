@@ -1,6 +1,8 @@
 package repositories
 
-import "bitbucket.org/pbisse/eventserver/application/types"
+import (
+	"bitbucket.org/pbisse/eventserver/application/types"
+)
 
 type MetricsData interface {
 	StreamsTotal() (types.StreamCount, error)

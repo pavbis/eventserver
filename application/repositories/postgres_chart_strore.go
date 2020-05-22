@@ -15,27 +15,17 @@ func NewPostgresChartStore(sqlManger *sql.DB) *postgresChartStore {
 func (c *postgresChartStore) EventsChartData() ([]byte, error) {
 	row := c.sqlManager.QueryRow(`SELECT COALESCE(stream_chart_data(), '[]')`)
 
-	return c.handleRDBMSResult(row)
+	return scanOrFail(row)
 }
 
 func (c *postgresChartStore) StreamChartData() ([]byte, error) {
 	row := c.sqlManager.QueryRow(`SELECT COALESCE(stream_stats_data(), '[]')`)
 
-	return c.handleRDBMSResult(row)
+	return scanOrFail(row)
 }
 
 func (c *postgresChartStore) EventsForCurrentMonth() ([]byte, error) {
 	row := c.sqlManager.QueryRow(`SELECT events_for_current_month()`)
 
-	return c.handleRDBMSResult(row)
-}
-
-func (c *postgresChartStore) handleRDBMSResult(r *sql.Row) ([]byte, error) {
-	var jsonResponse []byte
-
-	if err := r.Scan(&jsonResponse); err != nil {
-		return nil, err
-	}
-
-	return jsonResponse, nil
+	return scanOrFail(row)
 }

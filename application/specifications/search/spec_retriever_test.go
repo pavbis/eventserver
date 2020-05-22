@@ -44,7 +44,7 @@ func TestSpecRetrieverFindSpec(t *testing.T) {
 		name           string
 		input          types.Period
 		expectedResult SpecifiesPeriod
-		expression	   string
+		expression     string
 	}{
 		{
 			name:           "Test with last 24 hours period",

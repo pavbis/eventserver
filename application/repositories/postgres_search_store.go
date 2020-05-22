@@ -17,11 +17,5 @@ func (s *postgresSearchStore) SearchResults(st types.SearchTerm) ([]byte, error)
 	row := s.sqlManager.QueryRow(
 		`SELECT COALESCE(json_agg(t), '[]') FROM (SELECT search_results($1) as search_result) t`, st.Term)
 
-	var jsonResponse []byte
-
-	if err := row.Scan(&jsonResponse); err != nil {
-		return nil, err
-	}
-
-	return jsonResponse, nil
+	return scanOrFail(row)
 }

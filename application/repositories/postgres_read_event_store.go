@@ -98,12 +98,11 @@ func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([
 		'[]'
 )`, s.Name)
 
-	return p.handleRDBMSResult(row)
+	return scanOrFail(row)
 }
 
 func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec search.SpecifiesPeriod) ([]*types.EventDescription, error) {
-	query := fmt.Sprintf(`
-			SELECT 
+	query := fmt.Sprintf(`SELECT 
 				e."eventId",
 				e."eventName",
 				e."createdAt",
@@ -140,14 +139,4 @@ func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec 
 	}
 
 	return eventDescriptions, nil
-}
-
-func (p *postgresReadEventStore) handleRDBMSResult(r *sql.Row) ([]byte, error) {
-	var jsonResponse []byte
-
-	if err := r.Scan(&jsonResponse); err != nil {
-		return nil, err
-	}
-
-	return jsonResponse, nil
 }
