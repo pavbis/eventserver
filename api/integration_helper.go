@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
 	"testing"
 )
@@ -15,12 +14,6 @@ import (
 var a App
 
 var (
-	dbUser            = os.Getenv("DB_USER")
-	dbPassword        = os.Getenv("DB_PASSWORD")
-	dbName            = os.Getenv("DB_NAME")
-	dbHost            = os.Getenv("DB_HOST")
-	dbPort            = os.Getenv("DB_PORT")
-	dbSSLMode         = os.Getenv("DB_SSLMODE")
 	testConsumerId    = "2480b859-e08a-4414-9c7d-003bc1a4b555"
 	testProducerId    = "52a454e8-a111-4e5c-a715-2e46fedd8c47"
 	invalidProducerID = "52a454e8-a111-4e5c-a715-2e46fedd8c48"
@@ -28,7 +21,7 @@ var (
 
 func initializeApp() {
 	a = App{}
-	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
+	a.Initialize()
 }
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {

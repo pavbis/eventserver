@@ -1,11 +1,11 @@
 package api
 
 import (
+	"bitbucket.org/pbisse/eventserver/api/config"
 	"bitbucket.org/pbisse/eventserver/application/metrics"
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
@@ -29,11 +29,10 @@ var (
 	password = os.Getenv("AUTH_PASS")
 )
 
-func (a *App) Initialize(user, password, dbname, host, dbPort, sslmode string) {
+func (a *App) Initialize() {
 	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
-	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s", user, password, dbname, host, dbPort, sslmode)
-
+	dsn := config.NewDsnFromEnv()
 	var err error
 	a.DB, err = sql.Open("postgres", dsn)
 	if err != nil {
