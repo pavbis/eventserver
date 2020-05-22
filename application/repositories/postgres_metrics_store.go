@@ -40,6 +40,8 @@ func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	var streamTotals = make([]*types.StreamTotals, 0)
 
 	for rows.Next() {
@@ -64,6 +66,8 @@ func (p *postgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, err
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	var consumerTotals = make([]*types.ConsumerTotals, 0)
 
@@ -91,6 +95,8 @@ func (p *postgresMetricsStore) ConsumersOffsets() ([]*types.ConsumerOffsetData, 
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	var consumerOffsetData = make([]*types.ConsumerOffsetData, 0)
 

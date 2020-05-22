@@ -61,10 +61,9 @@ func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.St
 }
 
 func (p *postgresWriteEventStore) saveProducerStreamRelation(producerId types.ProducerId, streamName types.StreamName) {
-	_, _ = p.sqlManager.Query(
+	_, _ = p.sqlManager.Exec(
 		`INSERT INTO "producerStreamRelations" ("producerId", "streamName") VALUES ($1, $2) ON CONFLICT ("streamName") DO NOTHING`,
 		producerId.UUID, streamName.Name)
-	return
 }
 
 func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, streamName types.StreamName, eventId types.EventId) (string, error) {
