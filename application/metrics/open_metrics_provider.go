@@ -3,7 +3,6 @@ package metrics
 import (
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"github.com/prometheus/client_golang/prometheus"
-	"sync"
 )
 
 type openMetricsCollector struct {
@@ -12,8 +11,6 @@ type openMetricsCollector struct {
 	eventsInStream    *prometheus.Desc
 	consumersInStream *prometheus.Desc
 	consumersOffsets  *prometheus.Desc
-
-	mutex sync.Mutex
 }
 
 func NewOpenMetricsCollector(s repositories.MetricsData) *openMetricsCollector {
@@ -28,15 +25,12 @@ func NewOpenMetricsCollector(s repositories.MetricsData) *openMetricsCollector {
 
 func (o *openMetricsCollector) Describe(channel chan<- *prometheus.Desc) {
 	channel <- o.streams
+	channel <- o.consumersOffsets
 	channel <- o.eventsInStream
 	channel <- o.consumersInStream
-	channel <- o.consumersOffsets
 }
 
 func (o *openMetricsCollector) Collect(channel chan<- prometheus.Metric) {
-	o.mutex.Lock()
-	defer o.mutex.Unlock()
-
 	streamsTotal, err := o.metricsStorage.StreamsTotal()
 	eventsInStream, err := o.metricsStorage.EventsInStreamsWithOwner()
 	consumersInStream, err := o.metricsStorage.ConsumersInStream()

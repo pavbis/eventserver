@@ -11,7 +11,7 @@ definitions:
         name: run buid
         image: golang:1.14
         script:
-          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
+          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o eventserver .
           - gofmt -d ./
           - export DB_USER=root DB_PASSWORD=root DB_NAME=testdb DB_HOST=localhost DB_PORT=5432 DB_SSLMODE=disable AUTH_USER=test AUTH_PASS=test;
           - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
