@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -23,6 +24,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestHealthStatus(t *testing.T) {
+	fmt.Print(base64.StdEncoding.EncodeToString([]byte(`testtest`)))
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	response := executeRequest(req)
 
@@ -259,7 +261,12 @@ func authRequest(method string, url string, body io.Reader) *http.Request {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	req.Header.Add("Accept", "application/json; charset=utf-8")
-	req.Header.Add("Authorization", "Basic dGVzdDp0ZXN0")
+	req.Header.Add("Authorization", basicAuthValue())
 
 	return req
+}
+
+func basicAuthValue() string {
+	auth := os.Getenv("AUTH_USER") + ":" + os.Getenv("AUTH_PASS")
+	return "Basic " + base64.URLEncoding.EncodeToString([]byte(auth))
 }
