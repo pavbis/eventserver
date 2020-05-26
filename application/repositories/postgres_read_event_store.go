@@ -78,8 +78,7 @@ func (p *postgresReadEventStore) getConsumerOffset(
 
 func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([]byte, error) {
 	row := p.sqlManager.QueryRow(
-		`SELECT COALESCE(
-		(SELECT json_agg(c) FROM (
+		`SELECT COALESCE((SELECT json_agg(c) FROM (
 			SELECT
 				cOF."consumerId",
 				cOF."offset",
@@ -91,29 +90,31 @@ func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([
 		  		INNER JOIN events e USING ("eventName", "streamName")
 			WHERE cOF."streamName" = $1
 			GROUP BY  e."eventName", cOF."offset", cOF."consumerId", cOF."movedAt"
-			)
-		c),
-		'[]'
-)`, s.Name)
+			)c),'[]')`, s.Name)
 
 	return scanOrFail(row)
 }
 
 func (p *postgresReadEventStore) SelectEventsInStreamForPeriod(s types.StreamName, spec search.SpecifiesPeriod) ([]byte, error) {
-	query := fmt.Sprintf(`SELECT COALESCE((SELECT json_agg(q) FROM (
-    SELECT
-        e."eventId",
-        e."eventName",
-        e."createdAt",
-        COALESCE(ARRAY_AGG(cOF."consumerId") FILTER (WHERE cOF."consumerId" IS NOT NULL), '{}') as consumerIds
-    FROM events e
-    LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
-    AND e."streamName" = cOF."streamName"
-    AND e."sequence" <= cOF."offset"
-    WHERE e."streamName" = '%s' %s
-    GROUP BY e."eventId", e."createdAt", e."eventName"
-    ORDER BY e."createdAt" DESC
- )q), '[]')`, s.Name, spec.AndExpression())
+	query := fmt.Sprintf(`
+WITH events_in_stream AS (
+    SELECT json_agg(q) FROM (
+        SELECT
+            e."eventId",
+            e."eventName",
+            e."createdAt",
+            COALESCE(ARRAY_AGG(cOF."consumerId") FILTER (WHERE cOF."consumerId" IS NOT NULL), '{}') as consumerIds
+        FROM events e
+        LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
+        AND e."streamName" = cOF."streamName"
+        AND e."sequence" <= cOF."offset"
+        WHERE e."streamName" = '%s' %s
+        GROUP BY e."eventId", e."createdAt", e."eventName"
+        ORDER BY e."createdAt" DESC
+    )q
+)
+
+SELECT COALESCE((SELECT * FROM events_in_stream), '[]');`, s.Name, spec.AndExpression())
 
 	row := p.sqlManager.QueryRow(query)
 
