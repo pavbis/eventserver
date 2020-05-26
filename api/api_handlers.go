@@ -207,12 +207,12 @@ func (a *App) eventPeriodSearchRequestHandler(w http.ResponseWriter, r *http.Req
 	vars := mux.Vars(r)
 	streamName := types.StreamName{Name: vars["streamName"]}
 	readEventStore := repositories.NewPostgresReadEventStore(a.DB)
-	result, err := readEventStore.SelectEventsForStream(streamName, spec)
+	result, err := readEventStore.SelectEventsInStreamForPeriod(streamName, spec)
 
 	if err != nil {
 		a.respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	a.respondWithJSON(w, http.StatusOK, result)
+	a.respond(w, http.StatusOK, result)
 }

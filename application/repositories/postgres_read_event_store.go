@@ -5,8 +5,6 @@ import (
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
 	"fmt"
-	"strings"
-	"time"
 )
 
 type postgresReadEventStore struct {
@@ -101,42 +99,23 @@ func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([
 	return scanOrFail(row)
 }
 
-func (p *postgresReadEventStore) SelectEventsForStream(s types.StreamName, spec search.SpecifiesPeriod) ([]*types.EventDescription, error) {
-	query := fmt.Sprintf(`SELECT 
-				e."eventId",
-				e."eventName",
-				e."createdAt",
-				COALESCE(string_agg(cOF."consumerId", ','), '') as "consumerIds"
-			FROM events e
-				LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
-				AND e."streamName" = cOF."streamName"
-				AND e."sequence" <= cOF."offset"
-			WHERE e."streamName" = '%s' %s
-			GROUP BY e."eventId", e."createdAt", e."eventName"
-			ORDER BY e."createdAt" DESC`, s.Name, spec.AndExpression())
+func (p *postgresReadEventStore) SelectEventsInStreamForPeriod(s types.StreamName, spec search.SpecifiesPeriod) ([]byte, error) {
+	query := fmt.Sprintf(`SELECT COALESCE((SELECT json_agg(q) FROM (
+    SELECT
+        e."eventId",
+        e."eventName",
+        e."createdAt",
+        COALESCE(string_agg(cOF."consumerId", ','), '') as "consumerIds"
+    FROM events e
+    LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
+    AND e."streamName" = cOF."streamName"
+    AND e."sequence" <= cOF."offset"
+    WHERE e."streamName" = '%s' %s
+    GROUP BY e."eventId", e."createdAt", e."eventName"
+    ORDER BY e."createdAt" DESC
+ )q), '[]')`, s.Name, spec.AndExpression())
 
-	rows, err := p.sqlManager.Query(query)
+	row := p.sqlManager.QueryRow(query)
 
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	eventDescriptions := make([]*types.EventDescription, 0)
-
-	for rows.Next() {
-		var occurredOn time.Time
-		var consumerIds string
-		eventDescription := new(types.EventDescription)
-
-		if err := rows.Scan(&eventDescription.UUID, &eventDescription.EventName.Name, &occurredOn, &consumerIds); err != nil {
-			return nil, err
-		}
-		eventDescription.OccurredOn = types.OccurredOn{Date: occurredOn}
-		eventDescription.ConsumerIds = strings.Split(consumerIds, ",")
-		eventDescriptions = append(eventDescriptions, eventDescription)
-	}
-
-	return eventDescriptions, nil
+	return scanOrFail(row)
 }

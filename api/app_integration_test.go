@@ -24,7 +24,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestHealthStatus(t *testing.T) {
-	fmt.Print(base64.StdEncoding.EncodeToString([]byte(`testtest`)))
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	response := executeRequest(req)
 
