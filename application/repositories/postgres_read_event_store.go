@@ -105,7 +105,7 @@ func (p *postgresReadEventStore) SelectEventsInStreamForPeriod(s types.StreamNam
         e."eventId",
         e."eventName",
         e."createdAt",
-        COALESCE(string_agg(cOF."consumerId", ','), '') as "consumerIds"
+        COALESCE(ARRAY_AGG(cOF."consumerId") FILTER (WHERE cOF."consumerId" IS NOT NULL), '{}') as consumerIds
     FROM events e
     LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
     AND e."streamName" = cOF."streamName"
