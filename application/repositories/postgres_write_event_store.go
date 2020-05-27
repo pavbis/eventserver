@@ -3,7 +3,6 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
-	"errors"
 	"fmt"
 	"github.com/google/uuid"
 )
@@ -28,7 +27,7 @@ func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, strea
 	}
 
 	if relatedProducerId.UUID != producerId.UUID {
-		err := errors.New(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerId.UUID))
+		err := fmt.Errorf(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerId.UUID))
 		return eventId, err
 	}
 
@@ -83,7 +82,7 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 	nextOffset := consumerOffset.Increment()
 
 	if nextOffset.Offset != sequence.Pointer {
-		err := errors.New(fmt.Sprintf("Consumer offset mismatch: %d->%d", nextOffset.Offset, sequence.Pointer))
+		err := fmt.Errorf(fmt.Sprintf("Consumer offset mismatch: %d->%d", nextOffset.Offset, sequence.Pointer))
 		return message, err
 	}
 
@@ -97,7 +96,7 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 	}
 
 	return fmt.Sprintf(
-		"Succesfully moved offset to %d for cosumer id %s", nextOffset.Offset, consumerId.UUID.String()), nil
+		"Successfully moved offset to %d for cosumer id %s", nextOffset.Offset, consumerId.UUID.String()), nil
 }
 
 func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.StreamName, eventId types.EventId) (types.EventName, types.Sequence, error) {
@@ -109,7 +108,7 @@ func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.Strea
 		streamName.Name, eventId.UUID.String())
 
 	if err := row.Scan(&eventName.Name, &sequence.Pointer); err != nil {
-		err := errors.New(fmt.Sprintf("event not found in stream %s/%s", streamName.Name, eventId.UUID.String()))
+		err := fmt.Errorf(fmt.Sprintf("event not found in stream %s/%s", streamName.Name, eventId.UUID.String()))
 
 		return eventName, sequence, err
 	}

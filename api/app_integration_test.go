@@ -217,7 +217,7 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	expected := bytes.NewBufferString(fmt.Sprintf("Succesfully moved offset to 1 for cosumer id %s", testConsumerId))
+	expected := bytes.NewBufferString(fmt.Sprintf("Successfully moved offset to 1 for cosumer id %s", testConsumerId))
 	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
 }
 
