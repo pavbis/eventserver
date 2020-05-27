@@ -26,10 +26,10 @@ func checkBasicAuth(r *http.Request, user, pass string) bool {
 	return u == user && p == pass
 }
 
-// content type error
+// ErrContentType content type error
 var ErrContentType = errors.New("Content-Type header must be application/json; charset=utf-8")
 
-// accept error
+// ErrAccept accept error
 var ErrAccept = errors.New("accept header must be application/json; charset=utf-8")
 
 func contentTypeMiddleware(next http.HandlerFunc) http.HandlerFunc {

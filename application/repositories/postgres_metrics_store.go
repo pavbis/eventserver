@@ -9,7 +9,7 @@ type postgresMetricsStore struct {
 	sqlManager *sql.DB
 }
 
-// Creates the new instance of postgres metrics store
+// NewPostgresMetricsStore creates the new instance of postgres metrics store
 func NewPostgresMetricsStore(sqlManger *sql.DB) *postgresMetricsStore {
 	return &postgresMetricsStore{sqlManager: sqlManger}
 }
