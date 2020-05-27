@@ -3,15 +3,14 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 	"fmt"
 )
 
 type postgresReadEventStore struct {
-	sqlManager *sql.DB
+	sqlManager Executor
 }
 
-func NewPostgresReadEventStore(sqlManger *sql.DB) *postgresReadEventStore {
+func NewPostgresReadEventStore(sqlManger Executor) *postgresReadEventStore {
 	return &postgresReadEventStore{sqlManager: sqlManger}
 }
 
