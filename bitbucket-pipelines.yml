@@ -1,16 +1,25 @@
 definitions:
   services:
-    docker:
-      memory: 2048
+    postgres:
+      image: postgres
+      variables:
+        POSTGRES_DB: 'testdb'
+        POSTGRES_USER: 'root'
+        POSTGRES_PASSWORD: 'root'
   steps:
     - step: &eventserver-develop
         name: run buid
         image: golang:1.14
-        caches:
-          - node
         script:
-          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o calculator .
+          - go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o eventserver .
           - gofmt -d ./
+          - go get github.com/fzipp/gocyclo
+          - gocyclo -avg .
+          - export DB_USER=root DB_PASSWORD=root DB_NAME=testdb DB_HOST=localhost DB_PORT=5432 DB_SSLMODE=disable AUTH_USER=test AUTH_PASS=test;
+          - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
+          - go tool cover -func coverage.log
+        services:
+          - postgres
         artifacts:
           - ./eventserver
 

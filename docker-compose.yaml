@@ -14,24 +14,27 @@ services:
     depends_on:
       - postgres
     environment:
-      DB_USER: postgres
+      DB_USER: root
       DB_PASSWORD: root
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: postgres
+      DB_NAME: testdb
       DB_SSLMODE: disable
+      AUTH_USER: test
+      AUTH_PASS: test
+
   postgres:
+    image: postgres:12
+    container_name: event-server_postgres
     restart: always
-    hostname: postgres
-    container_name: postgres
+    ports:
+      - 5432:5432
     networks:
       - eventserver
-    build:
-      context: ./docker/postgres
-    ports:
-      - "5432:5432"
     environment:
+      POSTGRES_USER: root
       POSTGRES_PASSWORD: root
+      POSTGRES_DB: testdb
 
 networks:
   eventserver:
