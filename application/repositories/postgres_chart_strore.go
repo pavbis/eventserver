@@ -8,6 +8,7 @@ type postgresChartStore struct {
 	sqlManager *sql.DB
 }
 
+// NewPostgresChartStore creates new instance of chart store
 func NewPostgresChartStore(sqlManger *sql.DB) *postgresChartStore {
 	return &postgresChartStore{sqlManager: sqlManger}
 }

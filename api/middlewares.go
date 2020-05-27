@@ -26,8 +26,11 @@ func checkBasicAuth(r *http.Request, user, pass string) bool {
 	return u == user && p == pass
 }
 
-var ContentTypeErr = errors.New("Content-Type header must be application/json; charset=utf-8")
-var AcceptErr = errors.New("accept header must be application/json; charset=utf-8")
+// content type error
+var ErrContentType = errors.New("Content-Type header must be application/json; charset=utf-8")
+
+// accept error
+var ErrAccept = errors.New("accept header must be application/json; charset=utf-8")
 
 func contentTypeMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -50,12 +53,12 @@ func checkHeaders(r *http.Request) error {
 	forcedContentType := "application/json; charset=utf-8"
 
 	if contentType != forcedContentType {
-		return ContentTypeErr
+		return ErrContentType
 	}
 
 	accept := r.Header.Get("Accept")
 	if accept != forcedContentType {
-		return AcceptErr
+		return ErrAccept
 	}
 
 	return nil

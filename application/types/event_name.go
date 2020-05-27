@@ -1,6 +1,6 @@
 package types
 
-// represents event name
+// EventName represents event name
 type EventName struct {
 	Name string `json:"name"`
 }
