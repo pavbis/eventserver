@@ -8,6 +8,8 @@ import (
 	"testing"
 )
 
+const expectedContentType = "application/json"
+
 func TestBasicAuthMiddlewareWithoutHeader(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
 	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
@@ -17,11 +19,17 @@ func TestBasicAuthMiddlewareWithoutHeader(t *testing.T) {
 	basicAuthMiddleware.ServeHTTP(res, req)
 
 	responseCode := res.Code
+	expectedResponseCode := http.StatusUnauthorized
 	responseBody := res.Body.String()
-	expectedBody := http.StatusText(http.StatusUnauthorized)
+	expectedBody := http.StatusText(expectedResponseCode)
+	contentType := res.Header().Get("Content-Type")
 
-	if responseCode != http.StatusUnauthorized {
-		t.Errorf("Expected response code is %d. Got %d", http.StatusUnauthorized, responseCode)
+	if expectedContentType != contentType {
+		t.Errorf("Expected content type is %s. Got %s", expectedContentType, contentType)
+	}
+
+	if responseCode != expectedResponseCode {
+		t.Errorf("Expected response code is %d. Got %d", expectedResponseCode, responseCode)
 	}
 
 	if responseBody != expectedBody {
@@ -40,11 +48,17 @@ func TestBasicAuthMiddlewareWithInvalidCredentials(t *testing.T) {
 	basicAuthMiddleware.ServeHTTP(res, req)
 
 	responseCode := res.Code
+	expectedResponseCode := http.StatusUnauthorized
 	responseBody := res.Body.String()
-	expectedBody := http.StatusText(http.StatusUnauthorized)
+	expectedBody := http.StatusText(expectedResponseCode)
+	contentType := res.Header().Get("Content-Type")
 
-	if responseCode != http.StatusUnauthorized {
-		t.Errorf("Expected response code is %d. Got %d", http.StatusUnauthorized, responseCode)
+	if expectedContentType != contentType {
+		t.Errorf("Expected content type is %s. Got %s", expectedContentType, contentType)
+	}
+
+	if responseCode != expectedResponseCode {
+		t.Errorf("Expected response code is %d. Got %d", expectedResponseCode, responseCode)
 	}
 
 	if responseBody != expectedBody {
@@ -56,7 +70,7 @@ func TestBasicAuthMiddlewareWithValidCredentials(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
 
 	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
-	validAuthString := os.Getenv("AUTH_USER") +":"+ os.Getenv("AUTH_PASS")
+	validAuthString := os.Getenv("AUTH_USER") + ":" + os.Getenv("AUTH_PASS")
 	validEncodedAuth := "Basic " + base64.URLEncoding.EncodeToString([]byte(validAuthString))
 
 	req.Header.Add("Authorization", validEncodedAuth)
@@ -66,8 +80,42 @@ func TestBasicAuthMiddlewareWithValidCredentials(t *testing.T) {
 	basicAuthMiddleware.ServeHTTP(res, req)
 
 	responseCode := res.Code
+	expectedResponseCode := http.StatusOK
 
-	if responseCode != http.StatusOK {
-		t.Errorf("Expected response code is %d. Got %d", http.StatusOK, responseCode)
+	if responseCode != expectedResponseCode {
+		t.Errorf("Expected response code is %d. Got %d", expectedResponseCode, responseCode)
+	}
+}
+
+func TestContentTypeMiddlewareWithMissingHeaders(t *testing.T) {
+	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
+
+	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
+	res := httptest.NewRecorder()
+
+	contentTypeMiddleWare := contentTypeMiddleware(nextMiddleware)
+	contentTypeMiddleWare.ServeHTTP(res, req)
+	responseCode := res.Code
+	expectedResponseCode := http.StatusBadRequest
+
+	if responseCode != expectedResponseCode {
+		t.Errorf("Expected response code is %d. Got %d", expectedResponseCode, responseCode)
+	}
+}
+
+func TestContentTypeMiddlewareWithMissingAcceptHeader(t *testing.T) {
+	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
+
+	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+	res := httptest.NewRecorder()
+
+	contentTypeMiddleWare := contentTypeMiddleware(nextMiddleware)
+	contentTypeMiddleWare.ServeHTTP(res, req)
+	responseCode := res.Code
+	expectedResponseCode := http.StatusBadRequest
+
+	if responseCode != expectedResponseCode {
+		t.Errorf("Expected response code is %d. Got %d", expectedResponseCode, responseCode)
 	}
 }
