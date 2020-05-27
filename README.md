@@ -1,3 +1,4 @@
+[![Go Report Card](https://goreportcard.com/badge/bitbucket.org/pbisse/eventserver)](https://goreportcard.com/report/bitbucket.org/pbisse/eventserver)
 
 # Event server
 
