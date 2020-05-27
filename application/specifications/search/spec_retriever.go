@@ -9,8 +9,10 @@ type specRetriever struct {
 	Specifications []SpecifiesPeriod
 }
 
+// the invalid period error
 var ErrInvalidPeriod = errors.New("period is not supported or invalid")
 
+// creates new instance of spec retriever
 func NewSpecRetriever(specs []SpecifiesPeriod) *specRetriever {
 	return &specRetriever{Specifications: specs}
 }

@@ -9,6 +9,7 @@ type postgresSearchStore struct {
 	sqlManager *sql.DB
 }
 
+// Creates the new instance of postgres search event store
 func NewPostgresSearchStore(sqlManger *sql.DB) *postgresSearchStore {
 	return &postgresSearchStore{sqlManager: sqlManger}
 }

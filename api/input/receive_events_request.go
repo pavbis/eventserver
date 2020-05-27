@@ -14,6 +14,7 @@ type receiveEvents struct {
 	Limit      int    `validate:"required"`
 }
 
+// creates valid receive events input
 func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
 	vars := mux.Vars(r)
 	consumerId, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))
