@@ -1,6 +1,6 @@
 package types
 
-// represents producer id
+// ProducerId represents producer id
 type ProducerId struct {
 	UUID string
 }

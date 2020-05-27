@@ -14,6 +14,7 @@ var (
 	dbSSLMode  = os.Getenv("DB_SSLMODE")
 )
 
+// NewDsnFromEnv provides the dsn connection string for database
 func NewDsnFromEnv() string {
 	return fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s", dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
 }

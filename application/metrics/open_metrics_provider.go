@@ -13,6 +13,7 @@ type openMetricsCollector struct {
 	consumersOffsets  *prometheus.Desc
 }
 
+// NewOpenMetricsCollector creates new instance of the metrics collector
 func NewOpenMetricsCollector(s repositories.MetricsData) *openMetricsCollector {
 	return &openMetricsCollector{
 		metricsStorage:    s,

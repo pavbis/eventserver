@@ -12,6 +12,7 @@ type receiveAcknowledgement struct {
 	EventId    uuid.UUID `validate:"required"`
 }
 
+// NewReceiveAcknowledgementFromRequest create new valid instance from input data
 func NewReceiveAcknowledgementFromRequest(r *http.Request) (*receiveAcknowledgement, error) {
 	vars := mux.Vars(r)
 	consumerId, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))

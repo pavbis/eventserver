@@ -9,7 +9,7 @@ type consumerForStreamInput struct {
 	StreamName string `validate:"required"`
 }
 
-// creates valid consumer for stream input
+// NewConsumerForStreamInputFromRequest creates valid consumer for stream input
 func NewConsumerForStreamInputFromRequest(r *http.Request) *consumerForStreamInput {
 	vars := mux.Vars(r)
 

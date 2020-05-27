@@ -5,6 +5,7 @@ import (
 	"database/sql"
 )
 
+// MetricsData is the interface for metric operations
 type MetricsData interface {
 	StreamsTotal() (types.StreamCount, error)
 	EventsInStreamsWithOwner() ([]*types.StreamTotals, error)
@@ -12,6 +13,7 @@ type MetricsData interface {
 	ConsumersOffsets() ([]*types.ConsumerOffsetData, error)
 }
 
+// Executor is the interface for slq operations
 type Executor interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
 	Query(query string, args ...interface{}) (*sql.Rows, error)
