@@ -2,9 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -37,14 +35,13 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 	}
 }
 
-func readFileContent(filename string) []byte {
+func readFileContent(filename string) ([]byte, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Println("File reading error", err)
-		return nil
+		return nil, err
 	}
 
-	return data
+	return data, nil
 }
 
 func checkResponseBody(t *testing.T, body []byte, expected []byte) {
@@ -69,26 +66,28 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 	}
 }
 
-func readFileAndExecuteQuery(filePath string) {
-	query := readFileContent(filePath)
+func readFileAndExecuteQuery(filePath string) error {
+	query, _ := readFileContent(filePath)
 
 	if _, err := a.DB.Exec(string(query)); err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 func ensureTableExists() {
-	readFileAndExecuteQuery("sql/init-table.sql")
+	_ = readFileAndExecuteQuery("sql/init-table.sql")
 }
 
 func storeRDBMSFunctions() {
-	readFileAndExecuteQuery("sql/functions.sql")
+	_ = readFileAndExecuteQuery("sql/functions.sql")
 }
 
 func applyFixtures() {
-	readFileAndExecuteQuery("sql/fixtures.sql")
+	_ = readFileAndExecuteQuery("sql/fixtures.sql")
 }
 
 func updateEventsDatesToCurrentMonthAndYear() {
-	readFileAndExecuteQuery("sql/updateEventsDates.sql")
+	_ = readFileAndExecuteQuery("sql/updateEventsDates.sql")
 }

@@ -41,7 +41,7 @@ func TestReceiveEventWithoutValidHeadersAndAuthorisation(t *testing.T) {
 func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/stats/events-per-stream", nil)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/stats/events_per_stream/valid_response.json")
+	expected, _ := readFileContent("testdata/output/stats/events_per_stream/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
@@ -75,7 +75,7 @@ func TestReceiveEventsWithValidParameters(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/streams/mavi/events?limit=10&eventName=Snickers", nil)
 	req.Header.Add("X-Consumer-ID", testConsumerId)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/receive_events/valid_response.json")
+	expected, _ := readFileContent("testdata/output/receive_events/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
@@ -93,7 +93,7 @@ func TestReceiveEventsWithValidParametersReturnsEmptyResult(t *testing.T) {
 func TestConsumersForStreamRequestHandler(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/consumers/nicowa", nil)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/consumers_for_stream/valid_response.json")
+	expected, _ := readFileContent("testdata/output/consumers_for_stream/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
@@ -102,7 +102,7 @@ func TestConsumersForStreamRequestHandler(t *testing.T) {
 func TestReceiveStreamDataRequestHandler(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/stats/stream-data", nil)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/stats/stream_data/valid_response.json")
+	expected, _ := readFileContent("testdata/output/stats/stream_data/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
@@ -111,7 +111,7 @@ func TestReceiveStreamDataRequestHandler(t *testing.T) {
 func TestEventsForCurrentMonthRequestHandler(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/stats/events-current-month", nil)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/stats/events_current_month/valid_response.json")
+	expected, _ := readFileContent("testdata/output/stats/events_current_month/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
@@ -131,7 +131,7 @@ func TestSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 func TestSearchRequestHandlerWithQueryArgument(t *testing.T) {
 	req := authRequest(http.MethodPost, "/api/v1/search?_q=nic", nil)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/search/valid_response.json")
+	expected, _ := readFileContent("testdata/output/search/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
@@ -151,7 +151,7 @@ func TestEventPeriodSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 func TestEventPeriodSearchRequestHandlerWithQueryArgument(t *testing.T) {
 	req := authRequest(http.MethodPost, "/api/v1/event-period-search/maerz?period=6 hour", nil)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/search/event_period/valid_response.json")
+	expected, _ := readFileContent("testdata/output/search/event_period/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 	checkResponseBody(t, response.Body.Bytes(), expected)
@@ -169,7 +169,7 @@ func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {
 }
 
 func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
-	payload := readFileContent("testdata/input/receive_event.json")
+	payload, _ := readFileContent("testdata/input/receive_event.json")
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
 	req.Header.Add("X-Producer-ID", testProducerId)
 	response := executeRequest(req)
@@ -178,7 +178,7 @@ func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
 }
 
 func TestReceiveEventRequestHandlerWithInvalidProducerIDForReservedStream(t *testing.T) {
-	payload := readFileContent("testdata/input/receive_event.json")
+	payload, _ := readFileContent("testdata/input/receive_event.json")
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
 	req.Header.Add("X-Producer-ID", invalidProducerID)
 	response := executeRequest(req)
@@ -202,7 +202,7 @@ func TestReceiveAcknowledgementRequestHandlerWithMissingConsumerId(t *testing.T)
 }
 
 func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
-	payload := readFileContent("testdata/input/receive_event.json")
+	payload, _ := readFileContent("testdata/input/receive_event.json")
 	receiveEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-two/events", bytes.NewBuffer(payload))
 	receiveEventReq.Header.Add("X-Producer-ID", testProducerId)
 	receiveEventResponse := executeRequest(receiveEventReq)
@@ -222,13 +222,13 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 }
 
 func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T) {
-	payload := readFileContent("testdata/input/receive_event.json")
+	payload, _ := readFileContent("testdata/input/receive_event.json")
 	receiveFirstEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-three/events", bytes.NewBuffer(payload))
 	receiveFirstEventReq.Header.Add("X-Producer-ID", testProducerId)
 	rr := httptest.NewRecorder()
 	a.Router.ServeHTTP(rr, receiveFirstEventReq)
 
-	payloadTwo := readFileContent("testdata/input/receive_event.json")
+	payloadTwo, _ := readFileContent("testdata/input/receive_event.json")
 	receiveSecondEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-three/events", bytes.NewBuffer(payloadTwo))
 	receiveSecondEventReq.Header.Add("X-Producer-ID", testProducerId)
 	receiveEventResponse := executeRequest(receiveSecondEventReq)
@@ -252,7 +252,7 @@ func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T
 func TestMetricsEndPoint(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/metrics", nil)
 	response := executeRequest(req)
-	expected := readFileContent("testdata/output/metrics/valid_response.txt")
+	expected, _ := readFileContent("testdata/output/metrics/valid_response.txt")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 
