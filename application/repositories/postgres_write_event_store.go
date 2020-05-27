@@ -11,7 +11,7 @@ type postgresWriteEventStore struct {
 	sqlManager *sql.DB
 }
 
-// Creates the new instance of postgres write event store
+// NewPostgresWriteEventStore creates the new instance of postgres write event store
 func NewPostgresWriteEventStore(sqlManger *sql.DB) *postgresWriteEventStore {
 	return &postgresWriteEventStore{sqlManager: sqlManger}
 }

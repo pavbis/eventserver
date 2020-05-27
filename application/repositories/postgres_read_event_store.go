@@ -10,6 +10,7 @@ type postgresReadEventStore struct {
 	sqlManager Executor
 }
 
+// NewPostgresReadEventStore creates new instance of read event store
 func NewPostgresReadEventStore(sqlManger Executor) *postgresReadEventStore {
 	return &postgresReadEventStore{sqlManager: sqlManger}
 }

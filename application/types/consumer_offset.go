@@ -5,7 +5,7 @@ type ConsumerOffset struct {
 	Offset int `json:"offset"`
 }
 
-// increments consumer offset
+// Increment increments consumer offset
 func (c ConsumerOffset) Increment() ConsumerOffset {
 	c.Offset++
 

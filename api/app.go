@@ -17,6 +17,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// App represents the whole service
 type App struct {
 	Router   *mux.Router
 	DB       *sql.DB
@@ -29,6 +30,7 @@ var (
 	password = os.Getenv("AUTH_PASS")
 )
 
+// Initialize does the app initialization
 func (a *App) Initialize() {
 	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
@@ -50,6 +52,7 @@ func (a *App) Initialize() {
 	a.initializeRoutes()
 }
 
+// Run runs the app on specific port
 func (a *App) Run(addr string) {
 	loggedRouter := a.createLoggingRouter(a.Logger.Writer())
 	a.Logger.Fatal(http.ListenAndServe(addr, loggedRouter))
