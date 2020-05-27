@@ -3,6 +3,7 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/api/config"
 	"database/sql"
+	_ "github.com/lib/pq"
 	"testing"
 )
 
