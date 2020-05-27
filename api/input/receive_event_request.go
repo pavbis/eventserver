@@ -10,6 +10,7 @@ type receiveEventRequest struct {
 	StreamName  string `validate:"required"`
 }
 
+// creates valid receive event input
 func NewReceiveEventRequestFromRequest(r *http.Request) *receiveEventRequest {
 	vars := mux.Vars(r)
 
