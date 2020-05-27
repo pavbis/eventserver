@@ -48,10 +48,10 @@ func readFileContent(filename string) []byte {
 }
 
 func checkResponseBody(t *testing.T, body []byte, expected []byte) {
-	var m1 map[string]interface{}
+	var m1 []interface{}
 	_ = json.Unmarshal(body, &m1)
 
-	var m2 map[string]interface{}
+	var m2 []interface{}
 	_ = json.Unmarshal(expected, &m2)
 
 	if !reflect.DeepEqual(m1, m2) {

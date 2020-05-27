@@ -1,0 +1,51 @@
+# HELP consumer_offset Current offset of consumers per stream and event
+# TYPE consumer_offset gauge
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b221",eventName="Snickers",stream="hatico"} 44
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b221",eventName="Snickers",stream="nicowa"} 97
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b221",eventName="Snickers",stream="sandwich"} 120
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b222",eventName="Snickers",stream="maerz"} 55
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b333",eventName="Bloom",stream="nicowa"} 6
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b443",eventName="Snickers",stream="carl-gross"} 23
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b443",eventName="Snickers",stream="codello"} 5
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b443",eventName="Snickers",stream="nina-von-c"} 14
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b444",eventName="Blaam",stream="nicowa"} 5
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b444",eventName="Bliim",stream="nicowa"} 3
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b444",eventName="Bluum",stream="nicowa"} 10
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b444",eventName="Bluum",stream="sandwich"} 1
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b555",eventName="GdriveSync",stream="integration-two"} 1
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b555",eventName="Snickers",stream="mavi"} 44
+consumer_offset{consumerId="2480b859-e08a-4414-9c7d-003bc1a4b555",eventName="Snickers",stream="miracle"} 33
+consumer_offset{consumerId="52a454e8-a111-4e5c-a715-2e46fedd8c47",eventName="ExampleEventOne",stream="streamOne"} 1
+consumer_offset{consumerId="52a454e8-a111-4e5c-a715-2e46fedd8c47",eventName="ExampleEventThree",stream="streamOne"} 1
+consumer_offset{consumerId="52a454e8-a111-4e5c-a715-2e46fedd8c47",eventName="ExampleEventTwo",stream="streamOne"} 2
+# HELP consumers_total Total amount of registered consumers per stream
+# TYPE consumers_total counter
+consumers_total{stream="carl-gross"} 1
+consumers_total{stream="codello"} 1
+consumers_total{stream="hatico"} 1
+consumers_total{stream="integration-two"} 1
+consumers_total{stream="maerz"} 1
+consumers_total{stream="mavi"} 1
+consumers_total{stream="miracle"} 1
+consumers_total{stream="nicowa"} 3
+consumers_total{stream="nina-von-c"} 1
+consumers_total{stream="sandwich"} 2
+consumers_total{stream="streamOne"} 1
+# HELP events_total Total amount of events per stream
+# TYPE events_total counter
+events_total{producerId="52a454e8-a111-4e5c-a715-2e46fedd8c47",stream="integration"} 1
+events_total{producerId="52a454e8-a111-4e5c-a715-2e46fedd8c47",stream="integration-three"} 2
+events_total{producerId="52a454e8-a111-4e5c-a715-2e46fedd8c47",stream="integration-two"} 1
+events_total{producerId="634e2cd7-bcb0-4dcd-a829-aadca93e3f7b",stream="streamOne"} 5
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="carl-gross"} 68
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="codello"} 16
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="hatico"} 73
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="maerz"} 91
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="mavi"} 175
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="miracle"} 80
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="nicowa"} 157
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="nina-von-c"} 22
+events_total{producerId="f1f5cae6-30b7-43e7-a5e8-746a98bc265e",stream="sandwich"} 199
+# HELP streams_total Total number of streams
+# TYPE streams_total counter
+streams_total 13

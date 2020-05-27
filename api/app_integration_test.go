@@ -87,7 +87,7 @@ func TestReceiveEventsWithValidParametersReturnsEmptyResult(t *testing.T) {
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), []byte(""))
+	checkResponseBody(t, response.Body.Bytes(), []byte(`[]`))
 }
 
 func TestConsumersForStreamRequestHandler(t *testing.T) {
@@ -252,8 +252,13 @@ func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T
 func TestMetricsEndPoint(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/metrics", nil)
 	response := executeRequest(req)
+	expected := readFileContent("testdata/output/metrics/valid_response.txt")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
+
+	if response.Body.String() != string(expected) {
+		t.Errorf("Expected %v. Got %v", string(expected), response.Body.String())
+	}
 }
 
 func authRequest(method string, url string, body io.Reader) *http.Request {

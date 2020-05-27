@@ -2,24 +2,25 @@ package search
 
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
+	"errors"
 	"testing"
 )
 
 func TestSpecRetrieverError(t *testing.T) {
 	tests := []struct {
-		name           string
-		input          types.Period
-		expectedResult error
+		name  string
+		input types.Period
+		error error
 	}{
 		{
-			name:           "Test with invalid period",
-			input:          types.Period{Value: "invalid"},
-			expectedResult: ErrInvalidPeriod,
+			name:  "Test with invalid period",
+			input: types.Period{Value: "invalid"},
+			error: ErrInvalidPeriod,
 		},
 		{
-			name:           "Test with invalid period",
-			input:          types.Period{Value: "2222 nights"},
-			expectedResult: ErrInvalidPeriod,
+			name:  "Test with invalid period",
+			input: types.Period{Value: "2222 nights"},
+			error: ErrInvalidPeriod,
 		},
 	}
 
@@ -28,12 +29,12 @@ func TestSpecRetrieverError(t *testing.T) {
 		specRetriever := NewSpecRetriever(specList.ListAll())
 		result, err := specRetriever.FindSpec(&test.input)
 
-		if err != test.expectedResult {
+		if !errors.Is(err, test.error) {
 			t.Errorf(
 				"for spec retriever test '%s', got result %d but expected %d",
 				test.name,
 				result,
-				test.expectedResult,
+				test.error,
 			)
 		}
 	}
