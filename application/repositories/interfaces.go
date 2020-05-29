@@ -13,7 +13,7 @@ type MetricsData interface {
 	ConsumersOffsets() ([]*types.ConsumerOffsetData, error)
 }
 
-// Executor is the interface for slq operations
+// Executor is the interface for sql operations
 type Executor interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
 	Query(query string, args ...interface{}) (*sql.Rows, error)

@@ -6,7 +6,7 @@ import (
 )
 
 type postgresMetricsStore struct {
-	sqlManager *sql.DB
+	sqlManager Executor
 }
 
 // NewPostgresMetricsStore creates the new instance of postgres metrics store

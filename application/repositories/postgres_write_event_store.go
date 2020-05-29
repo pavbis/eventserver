@@ -8,7 +8,7 @@ import (
 )
 
 type postgresWriteEventStore struct {
-	sqlManager *sql.DB
+	sqlManager Executor
 }
 
 // NewPostgresWriteEventStore creates the new instance of postgres write event store
