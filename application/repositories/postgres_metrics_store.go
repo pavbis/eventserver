@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 )
 
 type postgresMetricsStore struct {
@@ -10,7 +9,7 @@ type postgresMetricsStore struct {
 }
 
 // NewPostgresMetricsStore creates the new instance of postgres metrics store
-func NewPostgresMetricsStore(sqlManger *sql.DB) *postgresMetricsStore {
+func NewPostgresMetricsStore(sqlManger Executor) *postgresMetricsStore {
 	return &postgresMetricsStore{sqlManager: sqlManger}
 }
 

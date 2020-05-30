@@ -10,7 +10,7 @@ import (
 
 const (
 	expectedContentType = "application/json"
-	dummyUrl = "http://www.your-domain.com"
+	dummyUrl            = "http://www.your-domain.com"
 )
 
 func TestBasicAuthMiddlewareWithoutHeader(t *testing.T) {

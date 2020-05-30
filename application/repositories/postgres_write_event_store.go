@@ -16,7 +16,10 @@ func NewPostgresWriteEventStore(sqlManger *sql.DB) *postgresWriteEventStore {
 	return &postgresWriteEventStore{sqlManager: sqlManger}
 }
 
-func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, streamName types.StreamName, event types.Event) (types.EventId, error) {
+func (p *postgresWriteEventStore) RecordEvent(
+	producerId types.ProducerId,
+	streamName types.StreamName,
+	event types.Event) (types.EventId, error) {
 	relatedProducerId := p.getProducerIdForStreamName(streamName)
 
 	var eventId types.EventId
