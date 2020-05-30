@@ -67,11 +67,6 @@ func (a *App) receiveAcknowledgementRequestHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
-	if err := a.validate.Struct(receiveAcknowledgementRequest); err != nil {
-		a.respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
 	consumerId := types.ConsumerId{UUID: receiveAcknowledgementRequest.ConsumerId}
 	streamName := types.StreamName{Name: receiveAcknowledgementRequest.StreamName}
 	eventId := types.EventId{UUID: receiveAcknowledgementRequest.EventId}

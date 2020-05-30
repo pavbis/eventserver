@@ -221,6 +221,18 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
 }
 
+func TestReceiveAcknowledgementRequestHandlerWithNotExistentEvent(t *testing.T) {
+	req := authRequest(http.MethodPost, "/api/v1/streams/integration-two/events/ef452ece-667b-4af3-a09b-8c1a692d818d", nil)
+	req.Header.Add("X-Consumer-ID", testConsumerId)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"event not found in stream integration-two/ef452ece-667b-4af3-a09b-8c1a692d818d")
+}
+
 func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T) {
 	payload, _ := readFileContent("testdata/input/receive_event.json")
 	receiveFirstEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-three/events", bytes.NewBuffer(payload))
