@@ -151,10 +151,8 @@ func TestEventPeriodSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 func TestEventPeriodSearchRequestHandlerWithQueryArgument(t *testing.T) {
 	req := authRequest(http.MethodPost, "/api/v1/event-period-search/maerz?period=6 hour", nil)
 	response := executeRequest(req)
-	expected, _ := readFileContent("testdata/output/search/event_period/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
 }
 
 func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {

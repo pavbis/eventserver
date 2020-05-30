@@ -1,4 +1,8 @@
+## Project status
+
 [![Go Report Card](https://goreportcard.com/badge/bitbucket.org/pbisse/eventserver)](https://goreportcard.com/report/bitbucket.org/pbisse/eventserver)
+[![codecov](https://codecov.io/bb/pbisse/eventserver/branch/master/graph/badge.svg)](https://codecov.io/bb/pbisse/eventserver)
+
 
 # Event server
 
