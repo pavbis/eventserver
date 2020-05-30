@@ -5,7 +5,7 @@ import (
 )
 
 type postgresChartStore struct {
-	sqlManager *sql.DB
+	sqlManager Executor
 }
 
 // NewPostgresChartStore creates new instance of chart store

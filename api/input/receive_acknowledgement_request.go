@@ -7,9 +7,9 @@ import (
 )
 
 type receiveAcknowledgement struct {
-	ConsumerId uuid.UUID `validate:"required"`
-	StreamName string    `validate:"required"`
-	EventId    uuid.UUID `validate:"required"`
+	ConsumerId uuid.UUID
+	StreamName string
+	EventId    uuid.UUID
 }
 
 // NewReceiveAcknowledgementFromRequest create new valid instance from input data

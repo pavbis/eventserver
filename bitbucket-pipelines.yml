@@ -18,6 +18,7 @@ definitions:
           - export DB_USER=root DB_PASSWORD=root DB_NAME=testdb DB_HOST=localhost DB_PORT=5432 DB_SSLMODE=disable AUTH_USER=test AUTH_PASS=test;
           - go test -v -coverpkg=./... -coverprofile=coverage.log ./...
           - go tool cover -func coverage.log
+          #- go tool cover -html=coverage.log
         services:
           - postgres
         artifacts:

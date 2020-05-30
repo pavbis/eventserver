@@ -6,7 +6,7 @@ import (
 )
 
 type postgresSearchStore struct {
-	sqlManager *sql.DB
+	sqlManager Executor
 }
 
 // NewPostgresSearchStore creates the new instance of postgres search event store

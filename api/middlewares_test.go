@@ -8,11 +8,14 @@ import (
 	"testing"
 )
 
-const expectedContentType = "application/json"
+const (
+	expectedContentType = "application/json"
+	dummyUrl            = "http://www.your-domain.com"
+)
 
 func TestBasicAuthMiddlewareWithoutHeader(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
-	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
+	req := httptest.NewRequest(http.MethodGet, dummyUrl, nil)
 	res := httptest.NewRecorder()
 
 	basicAuthMiddleware := basicAuthMiddleware(os.Getenv("AUTH_USER"), os.Getenv("AUTH_PASS"), nextMiddleware)
@@ -40,7 +43,7 @@ func TestBasicAuthMiddlewareWithoutHeader(t *testing.T) {
 func TestBasicAuthMiddlewareWithInvalidCredentials(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
 
-	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
+	req := httptest.NewRequest(http.MethodGet, dummyUrl, nil)
 	req.Header.Add("Authorization", "Basic "+base64.URLEncoding.EncodeToString([]byte(`invalid:invalid`)))
 	res := httptest.NewRecorder()
 
@@ -69,7 +72,7 @@ func TestBasicAuthMiddlewareWithInvalidCredentials(t *testing.T) {
 func TestBasicAuthMiddlewareWithValidCredentials(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
 
-	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
+	req := httptest.NewRequest(http.MethodGet, dummyUrl, nil)
 	validAuthString := os.Getenv("AUTH_USER") + ":" + os.Getenv("AUTH_PASS")
 	validEncodedAuth := "Basic " + base64.URLEncoding.EncodeToString([]byte(validAuthString))
 
@@ -90,7 +93,7 @@ func TestBasicAuthMiddlewareWithValidCredentials(t *testing.T) {
 func TestContentTypeMiddlewareWithMissingHeaders(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
 
-	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
+	req := httptest.NewRequest(http.MethodGet, dummyUrl, nil)
 	res := httptest.NewRecorder()
 
 	contentTypeMiddleWare := contentTypeMiddleware(nextMiddleware)
@@ -106,7 +109,7 @@ func TestContentTypeMiddlewareWithMissingHeaders(t *testing.T) {
 func TestContentTypeMiddlewareWithMissingAcceptHeader(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
 
-	req := httptest.NewRequest(http.MethodGet, "http://www.your-domain.com", nil)
+	req := httptest.NewRequest(http.MethodGet, dummyUrl, nil)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	res := httptest.NewRecorder()
 
