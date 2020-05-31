@@ -57,11 +57,13 @@ func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals
 }
 
 func (p *postgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, error) {
-	rows, err := p.sqlManager.Query(`SELECT
-                    cOF."streamName",
-                    COALESCE(COUNT(DISTINCT cOF."consumerId"), 0) as "countConsumer"
-                FROM "consumerOffsets" cOF
-                GROUP BY cOF."streamName"`)
+	rows, err := p.sqlManager.Query(`
+SELECT
+	cOF."streamName",
+	COALESCE(COUNT(DISTINCT cOF."consumerId"), 0) as "countConsumer"
+FROM "consumerOffsets" cOF
+GROUP BY cOF."streamName"
+`)
 
 	if err != nil {
 		return nil, err
@@ -84,13 +86,15 @@ func (p *postgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, err
 }
 
 func (p *postgresMetricsStore) ConsumersOffsets() ([]*types.ConsumerOffsetData, error) {
-	rows, err := p.sqlManager.Query(`SELECT
-                cOF."consumerId",
-                cOF."streamName",
-                cOF."offset",
-                cOF."eventName"
-            FROM "consumerOffsets" cOF 
-            ORDER BY "streamName"`)
+	rows, err := p.sqlManager.Query(`
+SELECT
+	cOF."consumerId",
+	cOF."streamName",
+	cOF."offset",
+	cOF."eventName"
+FROM "consumerOffsets" cOF 
+ORDER BY "streamName"
+`)
 
 	if err != nil {
 		return nil, err
