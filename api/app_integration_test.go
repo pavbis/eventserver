@@ -111,10 +111,8 @@ func TestReceiveStreamDataRequestHandler(t *testing.T) {
 func TestEventsForCurrentMonthRequestHandler(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/stats/events-current-month", nil)
 	response := executeRequest(req)
-	expected, _ := readFileContent("testdata/output/stats/events_current_month/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
 }
 
 func TestSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
