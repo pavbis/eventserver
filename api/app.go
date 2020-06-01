@@ -25,6 +25,8 @@ type App struct {
 	validate *validator.Validate
 }
 
+const maxConnections = 100
+
 var (
 	userName = os.Getenv("AUTH_USER")
 	password = os.Getenv("AUTH_PASS")
@@ -45,7 +47,8 @@ func (a *App) Initialize() {
 	if err != nil {
 		a.Logger.Fatal(err)
 	}
-
+	a.DB.SetMaxIdleConns(maxConnections)
+	a.DB.SetMaxOpenConns(maxConnections)
 	a.validate = validator.New()
 
 	a.Router = mux.NewRouter()
