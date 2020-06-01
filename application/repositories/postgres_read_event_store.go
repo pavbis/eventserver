@@ -61,12 +61,17 @@ func (p *postgresReadEventStore) getConsumerOffset(
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
-		`SELECT COALESCE((SELECT "offset" 
-				FROM "consumerOffsets" 
-				WHERE "consumerId" = $1 
-				AND "eventName" = $2 
-				AND "streamName" = $3 
-				LIMIT 1), 0)`,
+		`
+SELECT COALESCE(
+	(SELECT "offset" 
+		FROM "consumerOffsets" 
+		WHERE "consumerId" = $1 
+		AND "eventName" = $2 
+		AND "streamName" = $3 
+		LIMIT 1
+	), 0
+)
+`,
 		consumerId.UUID.String(), eventName.Name, streamName.Name)
 
 	if err := row.Scan(&consumerOffset.Offset); err != nil {
@@ -78,19 +83,20 @@ func (p *postgresReadEventStore) getConsumerOffset(
 
 func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([]byte, error) {
 	row := p.sqlManager.QueryRow(
-		`SELECT COALESCE((SELECT json_agg(c) FROM (
-			SELECT
-				cOF."consumerId",
-				cOF."offset",
-				cOF."movedAt",
-				e."eventName",
-				ROUND(("offset" * 100.0) / COUNT(e."eventId"), 2) AS "consumedPercentage",
-				COUNT(e."eventId") - "offset" AS "behind"
-			FROM "consumerOffsets" cOF
-		  		INNER JOIN events e USING ("eventName", "streamName")
-			WHERE cOF."streamName" = $1
-			GROUP BY  e."eventName", cOF."offset", cOF."consumerId", cOF."movedAt"
-			)c),'[]')`, s.Name)
+		`
+SELECT COALESCE((SELECT json_agg(c) FROM (
+	SELECT
+		cOF."consumerId",
+		cOF."offset",
+		cOF."movedAt",
+		e."eventName",
+		ROUND(("offset" * 100.0) / COUNT(e."eventId"), 2) AS "consumedPercentage",
+		COUNT(e."eventId") - "offset" AS "behind"
+	FROM "consumerOffsets" cOF
+		INNER JOIN events e USING ("eventName", "streamName")
+	WHERE cOF."streamName" = $1
+	GROUP BY  e."eventName", cOF."offset", cOF."consumerId", cOF."movedAt"
+	)c),'[]')`, s.Name)
 
 	return scanOrFail(row)
 }

@@ -111,10 +111,8 @@ func TestReceiveStreamDataRequestHandler(t *testing.T) {
 func TestEventsForCurrentMonthRequestHandler(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/stats/events-current-month", nil)
 	response := executeRequest(req)
-	expected, _ := readFileContent("testdata/output/stats/events_current_month/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
 }
 
 func TestSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
@@ -151,10 +149,8 @@ func TestEventPeriodSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 func TestEventPeriodSearchRequestHandlerWithQueryArgument(t *testing.T) {
 	req := authRequest(http.MethodPost, "/api/v1/event-period-search/maerz?period=6 hour", nil)
 	response := executeRequest(req)
-	expected, _ := readFileContent("testdata/output/search/event_period/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
 }
 
 func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {
@@ -219,6 +215,18 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 	expected := bytes.NewBufferString(fmt.Sprintf("Successfully moved offset to 1 for cosumer id %s", testConsumerId))
 	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
+}
+
+func TestReceiveAcknowledgementRequestHandlerWithNotExistentEvent(t *testing.T) {
+	req := authRequest(http.MethodPost, "/api/v1/streams/integration-two/events/ef452ece-667b-4af3-a09b-8c1a692d818d", nil)
+	req.Header.Add("X-Consumer-ID", testConsumerId)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"event not found in stream integration-two/ef452ece-667b-4af3-a09b-8c1a692d818d")
 }
 
 func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T) {

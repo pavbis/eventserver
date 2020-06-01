@@ -2,15 +2,14 @@ package repositories
 
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 )
 
 type postgresMetricsStore struct {
-	sqlManager *sql.DB
+	sqlManager Executor
 }
 
 // NewPostgresMetricsStore creates the new instance of postgres metrics store
-func NewPostgresMetricsStore(sqlManger *sql.DB) *postgresMetricsStore {
+func NewPostgresMetricsStore(sqlManger Executor) *postgresMetricsStore {
 	return &postgresMetricsStore{sqlManager: sqlManger}
 }
 
@@ -58,11 +57,13 @@ func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals
 }
 
 func (p *postgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, error) {
-	rows, err := p.sqlManager.Query(`SELECT
-                    cOF."streamName",
-                    COALESCE(COUNT(DISTINCT cOF."consumerId"), 0) as "countConsumer"
-                FROM "consumerOffsets" cOF
-                GROUP BY cOF."streamName"`)
+	rows, err := p.sqlManager.Query(`
+SELECT
+	cOF."streamName",
+	COALESCE(COUNT(DISTINCT cOF."consumerId"), 0) as "countConsumer"
+FROM "consumerOffsets" cOF
+GROUP BY cOF."streamName"
+`)
 
 	if err != nil {
 		return nil, err
@@ -85,13 +86,15 @@ func (p *postgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, err
 }
 
 func (p *postgresMetricsStore) ConsumersOffsets() ([]*types.ConsumerOffsetData, error) {
-	rows, err := p.sqlManager.Query(`SELECT
-                cOF."consumerId",
-                cOF."streamName",
-                cOF."offset",
-                cOF."eventName"
-            FROM "consumerOffsets" cOF 
-            ORDER BY "streamName"`)
+	rows, err := p.sqlManager.Query(`
+SELECT
+	cOF."consumerId",
+	cOF."streamName",
+	cOF."offset",
+	cOF."eventName"
+FROM "consumerOffsets" cOF 
+ORDER BY "streamName"
+`)
 
 	if err != nil {
 		return nil, err

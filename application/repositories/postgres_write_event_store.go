@@ -8,7 +8,7 @@ import (
 )
 
 type postgresWriteEventStore struct {
-	sqlManager *sql.DB
+	sqlManager Executor
 }
 
 // NewPostgresWriteEventStore creates the new instance of postgres write event store
@@ -16,7 +16,10 @@ func NewPostgresWriteEventStore(sqlManger *sql.DB) *postgresWriteEventStore {
 	return &postgresWriteEventStore{sqlManager: sqlManger}
 }
 
-func (p *postgresWriteEventStore) RecordEvent(producerId types.ProducerId, streamName types.StreamName, event types.Event) (types.EventId, error) {
+func (p *postgresWriteEventStore) RecordEvent(
+	producerId types.ProducerId,
+	streamName types.StreamName,
+	event types.Event) (types.EventId, error) {
 	relatedProducerId := p.getProducerIdForStreamName(streamName)
 
 	var eventId types.EventId
