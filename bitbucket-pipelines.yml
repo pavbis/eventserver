@@ -34,3 +34,5 @@ pipelines:
   branches:
     develop:
       - step: *eventserver-develop
+    master:
+      - step: *eventserver-develop
