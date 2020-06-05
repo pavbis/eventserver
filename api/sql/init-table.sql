@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS "events"
 );
 
 CREATE UNIQUE INDEX events_streamname_eventname_sequence_eventid_uindex
-  ON events ("streamName", "eventName", sequence, "eventId");
+    ON events ("streamName", "eventName", "createdAt", "sequence", "eventId");
 
 CREATE INDEX events_payload ON events((event->>'payload'));
 
