@@ -16,7 +16,7 @@ definitions:
           - go get github.com/fzipp/gocyclo
           - gocyclo -avg .
           - export DB_USER=root DB_PASSWORD=root DB_NAME=testdb DB_HOST=localhost DB_PORT=5432 DB_SSLMODE=disable AUTH_USER=test AUTH_PASS=test;
-          - go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
+          - go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
           - go tool cover -func coverage.txt
           - bash <(curl -s https://codecov.io/bash)
           #- go tool cover -html=coverage.txt
