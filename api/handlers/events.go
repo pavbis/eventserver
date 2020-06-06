@@ -11,6 +11,7 @@ import (
 	"net/http"
 )
 
+// ReceiveEventRequestHandler handles receiving of event
 func ReceiveEventRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	receiveEventRequest := input.NewReceiveEventRequestFromRequest(r)
 	v := validator.New()
@@ -51,6 +52,7 @@ func ReceiveEventRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, http.StatusCreated, result)
 }
 
+// ReceiveAcknowledgementRequestHandler acknowledges event
 func ReceiveAcknowledgementRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	receiveAcknowledgementRequest, err := input.NewReceiveAcknowledgementFromRequest(r)
 
@@ -74,6 +76,7 @@ func ReceiveAcknowledgementRequestHandler(db *sql.DB, w http.ResponseWriter, r *
 	respondWithJSON(w, http.StatusOK, result)
 }
 
+// ReceiveEventsRequestHandler returns event for provided stream
 func ReceiveEventsRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	receiveEventsRequest, err := input.NewReceiveEventsFromRequest(r)
 	v := validator.New()

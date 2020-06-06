@@ -101,6 +101,7 @@ func (a *App) initializeRoutes() {
 	a.Router.Handle("/api/v1/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 }
 
+// RequestHandlerFunction is the function to call any handle
 type RequestHandlerFunction func(db *sql.DB, w http.ResponseWriter, r *http.Request)
 
 func (a *App) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {

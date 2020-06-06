@@ -21,6 +21,7 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
 }
 
+// HealthRequestHandler provides response for load balancer
 func HealthRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	status := "OK"
 

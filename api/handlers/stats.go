@@ -9,6 +9,7 @@ import (
 	"net/http"
 )
 
+// ConsumersForStreamRequestHandler provides consumers for all streams
 func ConsumersForStreamRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	consumersRequest := input.NewConsumerForStreamInputFromRequest(r)
 	v := validator.New()
@@ -30,6 +31,7 @@ func ConsumersForStreamRequestHandler(db *sql.DB, w http.ResponseWriter, r *http
 	respond(w, http.StatusOK, result)
 }
 
+// ReceiveEventsChartDataRequestHandler provides events chart data
 func ReceiveEventsChartDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(db)
 	chartData, err := eventStore.EventsChartData()
@@ -42,6 +44,7 @@ func ReceiveEventsChartDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *
 	respond(w, http.StatusOK, chartData)
 }
 
+// ReceiveStreamDataRequestHandler provides streams chart data
 func ReceiveStreamDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(db)
 	chartData, err := eventStore.StreamChartData()
@@ -54,6 +57,7 @@ func ReceiveStreamDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.
 	respond(w, http.StatusOK, chartData)
 }
 
+// ReceiveEventsForCurrentMonthRequestHandler provides events chart data for current month
 func ReceiveEventsForCurrentMonthRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(db)
 	chartData, err := eventStore.EventsForCurrentMonth()

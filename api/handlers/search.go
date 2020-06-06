@@ -11,6 +11,7 @@ import (
 	"net/http"
 )
 
+// SearchRequestHandler provides search results for giv search term
 func SearchRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	searchTermRequest := input.NewSearchTermInputFromRequest(r)
 	v := validator.New()
@@ -32,6 +33,7 @@ func SearchRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	respond(w, http.StatusOK, result)
 }
 
+// EventPeriodSearchRequestHandler provides events for given period
 func EventPeriodSearchRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	period := types.Period{Value: r.URL.Query().Get("period")}
 	specList := search.SpecList{}
