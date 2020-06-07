@@ -24,7 +24,10 @@ type App struct {
 	Logger *log.Logger
 }
 
-const maxConnections = 100
+const (
+	maxConnections = 100
+	apiPathPrefix = "/api/v1"
+)
 
 var (
 	userName = os.Getenv("AUTH_USER")
@@ -49,7 +52,7 @@ func (a *App) Initialize() {
 	a.DB.SetMaxIdleConns(maxConnections)
 	a.DB.SetMaxOpenConns(maxConnections)
 
-	a.Router = mux.NewRouter()
+	a.Router = mux.NewRouter().PathPrefix(apiPathPrefix).Subrouter()
 	a.initializeRoutes()
 }
 
@@ -76,20 +79,21 @@ func (a *App) Post(path string, f func(w http.ResponseWriter, r *http.Request)) 
 
 func (a *App) initializeRoutes() {
 	a.Health("/health", a.handleRequest(handlers.HealthRequestHandler))
-	a.Post("/api/v1/streams/{streamName}/events", a.handleRequest(handlers.ReceiveEventRequestHandler))
 
-	a.Post("/api/v1/streams/{streamName}/events/{eventId}", a.handleRequest(handlers.ReceiveAcknowledgementRequestHandler))
-	a.Get("/api/v1/streams/{streamName}/events", a.handleRequest(handlers.ReceiveEventsRequestHandler))
+	// Events
+	a.Post("/streams/{streamName}/events", a.handleRequest(handlers.ReceiveEventRequestHandler))
+	a.Post("/streams/{streamName}/events/{eventId}", a.handleRequest(handlers.ReceiveAcknowledgementRequestHandler))
+	a.Get("/streams/{streamName}/events", a.handleRequest(handlers.ReceiveEventsRequestHandler))
 
 	// Stats
-	a.Get("/api/v1/consumers/{streamName}", a.handleRequest(handlers.ConsumersForStreamRequestHandler))
-	a.Get("/api/v1/stats/events-per-stream", a.handleRequest(handlers.ReceiveEventsChartDataRequestHandler))
-	a.Get("/api/v1/stats/stream-data", a.handleRequest(handlers.ReceiveStreamDataRequestHandler))
-	a.Get("/api/v1/stats/events-current-month", a.handleRequest(handlers.ReceiveEventsForCurrentMonthRequestHandler))
+	a.Get("/consumers/{streamName}", a.handleRequest(handlers.ConsumersForStreamRequestHandler))
+	a.Get("/stats/events-per-stream", a.handleRequest(handlers.ReceiveEventsChartDataRequestHandler))
+	a.Get("/stats/stream-data", a.handleRequest(handlers.ReceiveStreamDataRequestHandler))
+	a.Get("/stats/events-current-month", a.handleRequest(handlers.ReceiveEventsForCurrentMonthRequestHandler))
 
 	//Search
-	a.Post("/api/v1/search", a.handleRequest(handlers.SearchRequestHandler))
-	a.Post("/api/v1/event-period-search/{streamName}", a.handleRequest(handlers.EventPeriodSearchRequestHandler))
+	a.Post("/search", a.handleRequest(handlers.SearchRequestHandler))
+	a.Post("/event-period-search/{streamName}", a.handleRequest(handlers.EventPeriodSearchRequestHandler))
 
 	//Metrics
 	metricsStorage := repositories.NewPostgresMetricsStore(a.DB)
@@ -98,7 +102,7 @@ func (a *App) initializeRoutes() {
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(metricsCollector)
 
-	a.Router.Handle("/api/v1/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
+	a.Router.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 }
 
 // RequestHandlerFunction is the function to call any handle

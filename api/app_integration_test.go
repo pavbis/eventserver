@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestHealthStatus(t *testing.T) {
-	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/health", nil)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
