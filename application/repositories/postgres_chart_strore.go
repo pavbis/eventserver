@@ -1,15 +1,11 @@
 package repositories
 
-import (
-	"database/sql"
-)
-
 type postgresChartStore struct {
 	sqlManager Executor
 }
 
 // NewPostgresChartStore creates new instance of chart store
-func NewPostgresChartStore(sqlManger *sql.DB) *postgresChartStore {
+func NewPostgresChartStore(sqlManger Executor) *postgresChartStore {
 	return &postgresChartStore{sqlManager: sqlManger}
 }
 

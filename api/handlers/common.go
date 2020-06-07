@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"database/sql"
+	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"encoding/json"
 	"net/http"
 )
@@ -22,7 +22,7 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 }
 
 // HealthRequestHandler provides response for load balancer
-func HealthRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func HealthRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	status := "OK"
 
 	healthStatus := struct {

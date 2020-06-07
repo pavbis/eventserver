@@ -102,7 +102,7 @@ func (a *App) initializeRoutes() {
 }
 
 // RequestHandlerFunction is the function to call any handle
-type RequestHandlerFunction func(db *sql.DB, w http.ResponseWriter, r *http.Request)
+type RequestHandlerFunction func(db repositories.Executor, w http.ResponseWriter, r *http.Request)
 
 func (a *App) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 )
 
 type postgresSearchStore struct {
@@ -10,7 +9,7 @@ type postgresSearchStore struct {
 }
 
 // NewPostgresSearchStore creates the new instance of postgres search event store
-func NewPostgresSearchStore(sqlManger *sql.DB) *postgresSearchStore {
+func NewPostgresSearchStore(sqlManger Executor) *postgresSearchStore {
 	return &postgresSearchStore{sqlManager: sqlManger}
 }
 

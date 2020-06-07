@@ -4,7 +4,6 @@ import (
 	"bitbucket.org/pbisse/eventserver/api/input"
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 	"encoding/json"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -12,7 +11,7 @@ import (
 )
 
 // ReceiveEventRequestHandler handles receiving of event
-func ReceiveEventRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func ReceiveEventRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	receiveEventRequest := input.NewReceiveEventRequestFromRequest(r)
 	v := validator.New()
 
@@ -53,7 +52,7 @@ func ReceiveEventRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Reque
 }
 
 // ReceiveAcknowledgementRequestHandler acknowledges event
-func ReceiveAcknowledgementRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func ReceiveAcknowledgementRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	receiveAcknowledgementRequest, err := input.NewReceiveAcknowledgementFromRequest(r)
 
 	if err != nil {
@@ -77,7 +76,7 @@ func ReceiveAcknowledgementRequestHandler(db *sql.DB, w http.ResponseWriter, r *
 }
 
 // ReceiveEventsRequestHandler returns event for provided stream
-func ReceiveEventsRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func ReceiveEventsRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	receiveEventsRequest, err := input.NewReceiveEventsFromRequest(r)
 	v := validator.New()
 

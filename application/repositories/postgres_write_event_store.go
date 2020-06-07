@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
 )
@@ -12,7 +11,7 @@ type postgresWriteEventStore struct {
 }
 
 // NewPostgresWriteEventStore creates the new instance of postgres write event store
-func NewPostgresWriteEventStore(sqlManger *sql.DB) *postgresWriteEventStore {
+func NewPostgresWriteEventStore(sqlManger Executor) *postgresWriteEventStore {
 	return &postgresWriteEventStore{sqlManager: sqlManger}
 }
 

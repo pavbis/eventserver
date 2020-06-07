@@ -4,13 +4,12 @@ import (
 	"bitbucket.org/pbisse/eventserver/api/input"
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"net/http"
 )
 
 // ConsumersForStreamRequestHandler provides consumers for all streams
-func ConsumersForStreamRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func ConsumersForStreamRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	consumersRequest := input.NewConsumerForStreamInputFromRequest(r)
 	v := validator.New()
 
@@ -32,7 +31,7 @@ func ConsumersForStreamRequestHandler(db *sql.DB, w http.ResponseWriter, r *http
 }
 
 // ReceiveEventsChartDataRequestHandler provides events chart data
-func ReceiveEventsChartDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func ReceiveEventsChartDataRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(db)
 	chartData, err := eventStore.EventsChartData()
 
@@ -45,7 +44,7 @@ func ReceiveEventsChartDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *
 }
 
 // ReceiveStreamDataRequestHandler provides streams chart data
-func ReceiveStreamDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func ReceiveStreamDataRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(db)
 	chartData, err := eventStore.StreamChartData()
 
@@ -58,7 +57,7 @@ func ReceiveStreamDataRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.
 }
 
 // ReceiveEventsForCurrentMonthRequestHandler provides events chart data for current month
-func ReceiveEventsForCurrentMonthRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func ReceiveEventsForCurrentMonthRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	eventStore := repositories.NewPostgresChartStore(db)
 	chartData, err := eventStore.EventsForCurrentMonth()
 

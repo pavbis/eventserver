@@ -5,14 +5,13 @@ import (
 	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
-	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
 // SearchRequestHandler provides search results for giv search term
-func SearchRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func SearchRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	searchTermRequest := input.NewSearchTermInputFromRequest(r)
 	v := validator.New()
 
@@ -34,7 +33,7 @@ func SearchRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 // EventPeriodSearchRequestHandler provides events for given period
-func EventPeriodSearchRequestHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func EventPeriodSearchRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	period := types.Period{Value: r.URL.Query().Get("period")}
 	specList := search.SpecList{}
 	spec, err := search.NewSpecRetriever(specList.ListAll()).FindSpec(&period)
