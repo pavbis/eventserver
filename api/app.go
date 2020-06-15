@@ -26,7 +26,7 @@ type App struct {
 
 const (
 	maxConnections = 100
-	apiPathPrefix = "/api/v1"
+	apiPathPrefix  = "/api/v1"
 )
 
 var (
