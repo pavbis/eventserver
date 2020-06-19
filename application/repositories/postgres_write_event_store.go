@@ -3,7 +3,6 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"fmt"
-	"github.com/google/uuid"
 )
 
 type postgresWriteEventStore struct {
@@ -35,17 +34,17 @@ func (p *postgresWriteEventStore) RecordEvent(
 	}
 
 	query := `INSERT INTO "events" ("streamName", "eventName", "sequence", "eventId", "event")
-			VALUES ($1,$2, (SELECT COALESCE(MAX("sequence"),0) FROM "events" WHERE "streamName" = $3 AND "eventName" = $4 LIMIT 1) + 1, $5, $6)`
+			VALUES ($1,$2, (SELECT COALESCE(MAX("sequence"),0) FROM "events" WHERE "streamName" = $3 AND "eventName" = $4 LIMIT 1) + 1, $5, $6) RETURNING "eventId"`
 
-	_, err = p.sqlManager.Exec(query, streamName.Name, event.EventData.Name, streamName.Name, event.EventData.Name, event.EventId, event.ToJSON())
+	err = p.sqlManager.QueryRow(
+		query,
+		streamName.Name, event.EventData.Name, streamName.Name, event.EventData.Name, event.EventId, event.ToJSON()).Scan(&eventId.UUID)
 
 	if err != nil {
 		return eventId, err
 	}
 
-	validUuid, _ := uuid.Parse(event.EventId)
-
-	return types.EventId{UUID: validUuid}, nil
+	return eventId, nil
 }
 
 func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.StreamName) types.ProducerId {
