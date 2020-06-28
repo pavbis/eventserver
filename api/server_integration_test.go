@@ -234,7 +234,7 @@ func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T
 	receiveFirstEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-three/events", bytes.NewBuffer(payload))
 	receiveFirstEventReq.Header.Add("X-Producer-ID", testProducerId)
 	rr := httptest.NewRecorder()
-	s.Router.ServeHTTP(rr, receiveFirstEventReq)
+	s.router.ServeHTTP(rr, receiveFirstEventReq)
 
 	payloadTwo, _ := readFileContent("testdata/input/receive_event.json")
 	receiveSecondEventReq := authRequest(http.MethodPost, "/api/v1/streams/integration-three/events", bytes.NewBuffer(payloadTwo))

@@ -24,7 +24,7 @@ func initializeServer() {
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	s.Router.ServeHTTP(rr, req)
+	s.router.ServeHTTP(rr, req)
 
 	return rr
 }
@@ -69,7 +69,7 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 func readFileAndExecuteQuery(filePath string) error {
 	query, _ := readFileContent(filePath)
 
-	if _, err := s.DB.Exec(string(query)); err != nil {
+	if _, err := s.db.Exec(string(query)); err != nil {
 		return err
 	}
 

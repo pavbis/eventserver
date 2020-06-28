@@ -7,5 +7,5 @@ import (
 )
 
 func (s *Server) createLoggingRouter(out io.Writer) http.Handler {
-	return handlers.LoggingHandler(out, s.Router)
+	return handlers.LoggingHandler(out, s.router)
 }

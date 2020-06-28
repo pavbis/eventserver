@@ -19,9 +19,9 @@ import (
 
 // Server represents the whole service
 type Server struct {
-	Router *mux.Router
-	DB     *sql.DB
-	Logger *log.Logger
+	router *mux.Router
+	db     *sql.DB
+	logger *log.Logger
 }
 
 const (
@@ -36,45 +36,45 @@ var (
 
 // Initialize does the app initialization
 func (s *Server) Initialize() {
-	s.Logger = log.New(os.Stdout, "", log.LstdFlags)
+	s.logger = log.New(os.Stdout, "", log.LstdFlags)
 
 	dsn := config.NewDsnFromEnv()
 	var err error
-	s.DB, err = sql.Open("postgres", dsn)
+	s.db, err = sql.Open("postgres", dsn)
 	if err != nil {
-		s.Logger.Fatal(err)
+		s.logger.Fatal(err)
 	}
 
-	err = s.DB.Ping()
+	err = s.db.Ping()
 	if err != nil {
-		s.Logger.Fatal(err)
+		s.logger.Fatal(err)
 	}
-	s.DB.SetMaxIdleConns(maxConnections)
-	s.DB.SetMaxOpenConns(maxConnections)
+	s.db.SetMaxIdleConns(maxConnections)
+	s.db.SetMaxOpenConns(maxConnections)
 
-	s.Router = mux.NewRouter().PathPrefix(apiPathPrefix).Subrouter()
+	s.router = mux.NewRouter().PathPrefix(apiPathPrefix).Subrouter()
 	s.initializeRoutes()
 }
 
 // Run runs the server on specific port
 func (s *Server) Run(addr string) {
-	loggedRouter := s.createLoggingRouter(s.Logger.Writer())
-	s.Logger.Fatal(http.ListenAndServe(addr, loggedRouter))
+	loggedRouter := s.createLoggingRouter(s.logger.Writer())
+	s.logger.Fatal(http.ListenAndServe(addr, loggedRouter))
 }
 
 // Health provides the /health route for load balancer health check
 func (s *Server) Health(path string, f func(w http.ResponseWriter, r *http.Request)) {
-	s.Router.HandleFunc(path, f).Methods(http.MethodGet)
+	s.router.HandleFunc(path, f).Methods(http.MethodGet)
 }
 
 // Get wraps the router for GET method
 func (s *Server) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
-	s.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodGet)
+	s.router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodGet)
 }
 
 // Post wraps the router for POST method
 func (s *Server) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
-	s.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodPost)
+	s.router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodPost)
 }
 
 func (s *Server) initializeRoutes() {
@@ -96,13 +96,13 @@ func (s *Server) initializeRoutes() {
 	s.Post("/event-period-search/{streamName}", s.handleRequest(handlers.EventPeriodSearchRequestHandler))
 
 	//Metrics
-	metricsStorage := repositories.NewPostgresMetricsStore(s.DB)
+	metricsStorage := repositories.NewPostgresMetricsStore(s.db)
 	metricsCollector := metrics.NewOpenMetricsCollector(metricsStorage)
 
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(metricsCollector)
 
-	s.Router.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
+	s.router.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 }
 
 // RequestHandlerFunction is the function to call any handle
@@ -110,6 +110,6 @@ type RequestHandlerFunction func(db repositories.Executor, w http.ResponseWriter
 
 func (s *Server) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		handler(s.DB, w, r)
+		handler(s.db, w, r)
 	}
 }
