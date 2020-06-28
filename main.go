@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	a := api.ApiServer{}
-	a.Initialize()
-	a.Run(":8000")
+	s := api.Server{}
+	s.Initialize()
+	s.Run(":8000")
 }

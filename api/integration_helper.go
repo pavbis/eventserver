@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-var a ApiServer
+var s Server
 
 var (
 	testConsumerId    = "2480b859-e08a-4414-9c7d-003bc1a4b555"
@@ -18,13 +18,13 @@ var (
 )
 
 func initializeServer() {
-	a = ApiServer{}
-	a.Initialize()
+	s = Server{}
+	s.Initialize()
 }
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	a.Router.ServeHTTP(rr, req)
+	s.Router.ServeHTTP(rr, req)
 
 	return rr
 }
@@ -69,7 +69,7 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 func readFileAndExecuteQuery(filePath string) error {
 	query, _ := readFileContent(filePath)
 
-	if _, err := a.DB.Exec(string(query)); err != nil {
+	if _, err := s.DB.Exec(string(query)); err != nil {
 		return err
 	}
 

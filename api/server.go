@@ -17,8 +17,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// App represents the whole service
-type ApiServer struct {
+// Server represents the whole service
+type Server struct {
 	Router *mux.Router
 	DB     *sql.DB
 	Logger *log.Logger
@@ -35,81 +35,81 @@ var (
 )
 
 // Initialize does the app initialization
-func (a *ApiServer) Initialize() {
-	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
+func (s *Server) Initialize() {
+	s.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
 	dsn := config.NewDsnFromEnv()
 	var err error
-	a.DB, err = sql.Open("postgres", dsn)
+	s.DB, err = sql.Open("postgres", dsn)
 	if err != nil {
-		a.Logger.Fatal(err)
+		s.Logger.Fatal(err)
 	}
 
-	err = a.DB.Ping()
+	err = s.DB.Ping()
 	if err != nil {
-		a.Logger.Fatal(err)
+		s.Logger.Fatal(err)
 	}
-	a.DB.SetMaxIdleConns(maxConnections)
-	a.DB.SetMaxOpenConns(maxConnections)
+	s.DB.SetMaxIdleConns(maxConnections)
+	s.DB.SetMaxOpenConns(maxConnections)
 
-	a.Router = mux.NewRouter().PathPrefix(apiPathPrefix).Subrouter()
-	a.initializeRoutes()
+	s.Router = mux.NewRouter().PathPrefix(apiPathPrefix).Subrouter()
+	s.initializeRoutes()
 }
 
-// Run runs the app on specific port
-func (a *ApiServer) Run(addr string) {
-	loggedRouter := a.createLoggingRouter(a.Logger.Writer())
-	a.Logger.Fatal(http.ListenAndServe(addr, loggedRouter))
+// Run runs the server on specific port
+func (s *Server) Run(addr string) {
+	loggedRouter := s.createLoggingRouter(s.Logger.Writer())
+	s.Logger.Fatal(http.ListenAndServe(addr, loggedRouter))
 }
 
 // Health provides the /health route for load balancer health check
-func (a *ApiServer) Health(path string, f func(w http.ResponseWriter, r *http.Request)) {
-	a.Router.HandleFunc(path, f).Methods(http.MethodGet)
+func (s *Server) Health(path string, f func(w http.ResponseWriter, r *http.Request)) {
+	s.Router.HandleFunc(path, f).Methods(http.MethodGet)
 }
 
 // Get wraps the router for GET method
-func (a *ApiServer) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
-	a.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodGet)
+func (s *Server) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
+	s.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodGet)
 }
 
 // Post wraps the router for POST method
-func (a *ApiServer) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
-	a.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodPost)
+func (s *Server) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
+	s.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodPost)
 }
 
-func (a *ApiServer) initializeRoutes() {
-	a.Health("/health", a.handleRequest(handlers.HealthRequestHandler))
+func (s *Server) initializeRoutes() {
+	s.Health("/health", s.handleRequest(handlers.HealthRequestHandler))
 
 	// Events
-	a.Post("/streams/{streamName}/events", a.handleRequest(handlers.ReceiveEventRequestHandler))
-	a.Post("/streams/{streamName}/events/{eventId}", a.handleRequest(handlers.ReceiveAcknowledgementRequestHandler))
-	a.Get("/streams/{streamName}/events", a.handleRequest(handlers.ReceiveEventsRequestHandler))
+	s.Post("/streams/{streamName}/events", s.handleRequest(handlers.ReceiveEventRequestHandler))
+	s.Post("/streams/{streamName}/events/{eventId}", s.handleRequest(handlers.ReceiveAcknowledgementRequestHandler))
+	s.Get("/streams/{streamName}/events", s.handleRequest(handlers.ReceiveEventsRequestHandler))
 
 	// Stats
-	a.Get("/consumers/{streamName}", a.handleRequest(handlers.ConsumersForStreamRequestHandler))
-	a.Get("/stats/events-per-stream", a.handleRequest(handlers.ReceiveEventsChartDataRequestHandler))
-	a.Get("/stats/stream-data", a.handleRequest(handlers.ReceiveStreamDataRequestHandler))
-	a.Get("/stats/events-current-month", a.handleRequest(handlers.ReceiveEventsForCurrentMonthRequestHandler))
+	s.Get("/consumers/{streamName}", s.handleRequest(handlers.ConsumersForStreamRequestHandler))
+	s.Get("/stats/events-per-stream", s.handleRequest(handlers.ReceiveEventsChartDataRequestHandler))
+	s.Get("/stats/stream-data", s.handleRequest(handlers.ReceiveStreamDataRequestHandler))
+	s.Get("/stats/events-current-month", s.handleRequest(handlers.ReceiveEventsForCurrentMonthRequestHandler))
 
 	//Search
-	a.Post("/search", a.handleRequest(handlers.SearchRequestHandler))
-	a.Post("/event-period-search/{streamName}", a.handleRequest(handlers.EventPeriodSearchRequestHandler))
+	s.Post("/search", s.handleRequest(handlers.SearchRequestHandler))
+	s.Post("/event-period-search/{streamName}", s.handleRequest(handlers.EventPeriodSearchRequestHandler))
 
 	//Metrics
-	metricsStorage := repositories.NewPostgresMetricsStore(a.DB)
+	metricsStorage := repositories.NewPostgresMetricsStore(s.DB)
 	metricsCollector := metrics.NewOpenMetricsCollector(metricsStorage)
 
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(metricsCollector)
 
-	a.Router.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
+	s.Router.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 }
 
 // RequestHandlerFunction is the function to call any handle
 type RequestHandlerFunction func(db repositories.Executor, w http.ResponseWriter, r *http.Request)
 
-func (a *ApiServer) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {
+func (s *Server) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		handler(a.DB, w, r)
+		handler(s.DB, w, r)
 	}
 }
