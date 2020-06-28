@@ -13,7 +13,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	initializeApp()
+	initializeServer()
 	ensureTableExists()
 	storeRDBMSFunctions()
 	applyFixtures()

@@ -18,7 +18,7 @@ import (
 )
 
 // App represents the whole service
-type App struct {
+type ApiServer struct {
 	Router *mux.Router
 	DB     *sql.DB
 	Logger *log.Logger
@@ -35,7 +35,7 @@ var (
 )
 
 // Initialize does the app initialization
-func (a *App) Initialize() {
+func (a *ApiServer) Initialize() {
 	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
 	dsn := config.NewDsnFromEnv()
@@ -57,27 +57,27 @@ func (a *App) Initialize() {
 }
 
 // Run runs the app on specific port
-func (a *App) Run(addr string) {
+func (a *ApiServer) Run(addr string) {
 	loggedRouter := a.createLoggingRouter(a.Logger.Writer())
 	a.Logger.Fatal(http.ListenAndServe(addr, loggedRouter))
 }
 
 // Health provides the /health route for load balancer health check
-func (a *App) Health(path string, f func(w http.ResponseWriter, r *http.Request)) {
+func (a *ApiServer) Health(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, f).Methods(http.MethodGet)
 }
 
 // Get wraps the router for GET method
-func (a *App) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
+func (a *ApiServer) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodGet)
 }
 
 // Post wraps the router for POST method
-func (a *App) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
+func (a *ApiServer) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, contentTypeMiddleware(basicAuthMiddleware(userName, password, f))).Methods(http.MethodPost)
 }
 
-func (a *App) initializeRoutes() {
+func (a *ApiServer) initializeRoutes() {
 	a.Health("/health", a.handleRequest(handlers.HealthRequestHandler))
 
 	// Events
@@ -108,7 +108,7 @@ func (a *App) initializeRoutes() {
 // RequestHandlerFunction is the function to call any handle
 type RequestHandlerFunction func(db repositories.Executor, w http.ResponseWriter, r *http.Request)
 
-func (a *App) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {
+func (a *ApiServer) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handler(a.DB, w, r)
 	}

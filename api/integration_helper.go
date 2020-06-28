@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-var a App
+var a ApiServer
 
 var (
 	testConsumerId    = "2480b859-e08a-4414-9c7d-003bc1a4b555"
@@ -17,8 +17,8 @@ var (
 	invalidProducerID = "52a454e8-a111-4e5c-a715-2e46fedd8c48"
 )
 
-func initializeApp() {
-	a = App{}
+func initializeServer() {
+	a = ApiServer{}
 	a.Initialize()
 }
 
