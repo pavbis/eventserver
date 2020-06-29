@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bitbucket.org/pbisse/eventserver/api/config"
 	"bitbucket.org/pbisse/eventserver/api/handlers"
 	"bitbucket.org/pbisse/eventserver/application/metrics"
 	"bitbucket.org/pbisse/eventserver/application/repositories"
@@ -38,9 +37,8 @@ var (
 func (s *Server) Initialize() {
 	s.logger = log.New(os.Stdout, "", log.LstdFlags)
 
-	dsn := config.NewDsnFromEnv()
 	var err error
-	s.db, err = sql.Open("postgres", dsn)
+	s.db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		s.logger.Fatal(err)
 	}
