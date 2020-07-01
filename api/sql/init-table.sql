@@ -139,3 +139,7 @@ BEGIN
         WHERE cO."consumerId" = queryString;
 END;
 $$ LANGUAGE plpgsql;
+
+DROP SEQUENCE IF EXISTS integrationgdrivesync;
+DROP SEQUENCE IF EXISTS integrationthreegdrivesync;
+DROP SEQUENCE IF EXISTS integrationtwogdrivesync;

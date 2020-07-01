@@ -3,6 +3,7 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
 	"fmt"
+	"strings"
 )
 
 type postgresWriteEventStore struct {
@@ -28,17 +29,21 @@ func (p *postgresWriteEventStore) RecordEvent(
 		relatedProducerId.UUID = producerId.UUID
 	}
 
+	if err := p.createSequence(streamName, event.EventData.Name); err != nil {
+		return eventId, err
+	}
+
 	if relatedProducerId.UUID != producerId.UUID {
 		err := fmt.Errorf(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerId.UUID))
 		return eventId, err
 	}
 
-	query := `INSERT INTO "events" ("streamName", "eventName", "sequence", "eventId", "event")
-			VALUES ($1,$2, (SELECT COALESCE(MAX("sequence"),0) FROM "events" WHERE "streamName" = $3 AND "eventName" = $4 LIMIT 1) + 1, $5, $6) RETURNING "eventId"`
+	query := fmt.Sprintf(`INSERT INTO "events" ("streamName", "eventName", "sequence", "eventId", "event")
+			VALUES ($1,$2, nextval('%s'), $3, $4) RETURNING "eventId"`, strings.ToLower(streamName.Name+event.EventData.Name))
 
 	err = p.sqlManager.QueryRow(
 		query,
-		streamName.Name, event.EventData.Name, streamName.Name, event.EventData.Name, event.EventId, event.ToJSON()).Scan(&eventId.UUID)
+		streamName.Name, event.EventData.Name, event.EventId, event.ToJSON()).Scan(&eventId.UUID)
 
 	if err != nil {
 		return eventId, err
@@ -59,6 +64,19 @@ func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.St
 	}
 
 	return producerId
+}
+
+func (p *postgresWriteEventStore) createSequence(streamName types.StreamName, eventName string) error {
+	var err error
+	query := fmt.Sprintf(`CREATE SEQUENCE IF NOT EXISTS %s%s START 1;`, streamName.Name, eventName)
+
+	_, err = p.sqlManager.Exec(query)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *postgresWriteEventStore) saveProducerStreamRelation(producerId types.ProducerId, streamName types.StreamName) {
