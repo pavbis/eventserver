@@ -54,11 +54,10 @@ $$
 SELECT json_agg(q)
 FROM (
     SELECT
-        pSR."streamName" as label,
+        e."streamName" as label,
         COUNT(e) as value
-    FROM "producerStreamRelations" pSR
-        LEFT JOIN events e USING("streamName")
-    GROUP BY pSR."streamName"
+    FROM events e
+    GROUP BY e."streamName"
     ORDER BY value DESC
     LIMIT 10
 ) q;

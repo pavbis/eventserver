@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS "events"
 CREATE UNIQUE INDEX events_streamname_eventname_sequence_eventid_uindex
     ON events ("streamName", "eventName", "createdAt", "sequence", "eventId");
 
+CREATE INDEX events_streamname_eventid_uindex ON events("streamName", "eventId");
+
+CREATE INDEX events_sequence ON events (sequence);
+
 CREATE INDEX events_payload ON events((event->>'payload'));
 
 CREATE TABLE IF NOT EXISTS "consumerOffsets"
