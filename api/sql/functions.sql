@@ -55,9 +55,9 @@ SELECT json_agg(q)
 FROM (
     SELECT
         e."streamName" as label,
-        COUNT(e) as value
+        COUNT(e."eventId") as value
     FROM events e
-    GROUP BY e."streamName"
+    GROUP BY label
     ORDER BY value DESC
     LIMIT 10
 ) q;

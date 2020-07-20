@@ -29,12 +29,12 @@ func (p *postgresMetricsStore) StreamsTotal() (types.StreamCount, error) {
 
 func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals, error) {
 	rows, err := p.sqlManager.Query(`SELECT
-                    pSR."streamName",
-                    pSR."producerId",
-                    COALESCE(COUNT(e."eventId"), 0) as "eventCount"
-                FROM "producerStreamRelations" pSR
-                    LEFT JOIN events e USING ("streamName")
-                GROUP BY pSR."streamName", pSR."producerId"`)
+    pSR."streamName",
+    pSR."producerId",
+    COALESCE(COUNT(e."eventId"), 0) as "eventCount"
+FROM events e
+    LEFT JOIN "producerStreamRelations" pSR on e."streamName" = pSR."streamName"
+GROUP BY pSR."streamName", pSR."producerId"`)
 
 	if err != nil {
 		return nil, err
