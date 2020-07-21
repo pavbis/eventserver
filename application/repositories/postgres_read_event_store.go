@@ -83,24 +83,30 @@ SELECT COALESCE((SELECT json_agg(c) FROM (
 
 func (p *postgresReadEventStore) SelectEventsInStreamForPeriod(s types.StreamName, spec search.SpecifiesPeriod) ([]byte, error) {
 	query := fmt.Sprintf(`
-WITH events_in_stream AS (
-    SELECT json_agg(q) FROM (
-        SELECT
-            e."eventId",
-            e."eventName",
-            e."createdAt",
-            COALESCE(ARRAY_AGG(cOF."consumerId") FILTER (WHERE cOF."consumerId" IS NOT NULL), '{}') as consumerIds
-        FROM events e
+WITH found_events AS (
+    SELECT
+        e."streamName",
+        e."eventId",
+        e."eventName",
+        e."createdAt",
+        e."sequence"
+    FROM events e
+    WHERE e."streamName" = '%s' %s
+    LIMIT 1000
+)
+SELECT COALESCE((SELECT json_agg(q) FROM (
+    SELECT
+         e."eventId",
+         e."eventName",
+         e."createdAt",
+         COALESCE(ARRAY_REMOVE(ARRAY_AGG(cOF."consumerId"), NULL), '{}') as consumerIds
+    FROM found_events e
         LEFT JOIN "consumerOffsets" cOF ON e."eventName" = cOF."eventName"
         AND e."streamName" = cOF."streamName"
         AND e."sequence" <= cOF."offset"
-        WHERE e."streamName" = '%s' %s
-        GROUP BY e."eventId", e."createdAt", e."eventName"
-        ORDER BY e."createdAt" DESC
-    )q
-)
-
-SELECT COALESCE((SELECT * FROM events_in_stream), '[]');`, s.Name, spec.AndExpression())
+    GROUP BY e."eventId", e."eventName", e."createdAt"
+    ORDER BY e."createdAt" DESC
+)q), '[]');`, s.Name, spec.AndExpression())
 
 	row := p.sqlManager.QueryRow(query)
 
