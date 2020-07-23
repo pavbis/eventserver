@@ -55,7 +55,7 @@ SELECT json_agg(q)
 FROM (
     SELECT
         e."streamName" as label,
-        COUNT(e."eventId") as value
+        COUNT(*) as value
     FROM events e
     GROUP BY label
     ORDER BY value DESC
