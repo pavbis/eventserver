@@ -49,39 +49,39 @@ func TestSpecRetrieverFindSpec(t *testing.T) {
 	}{
 		{
 			name:           "Test with last 24 hours period",
-			input:          types.Period{Value: "24 hour"},
+			input:          types.Period{Value: "24hour"},
 			expectedResult: LastDaySpec{},
-			expression:     `AND "createdAt" >= now() - interval '24 hour'`,
+			expression:     `AND "createdAt" >= now() - interval '24hour'`,
 		},
 		{
 			name:           "Test with last month period",
-			input:          types.Period{Value: "1 month"},
+			input:          types.Period{Value: "1month"},
 			expectedResult: LastMonthSpec{},
-			expression:     `AND "createdAt" >= now() - interval '1 month'`,
+			expression:     `AND "createdAt" >= now() - interval '1month'`,
 		},
 		{
 			name:           "Test with last six hours period",
-			input:          types.Period{Value: "6 hour"},
+			input:          types.Period{Value: "6hour"},
 			expectedResult: LastSixHoursSpec{},
-			expression:     `AND "createdAt" >= now() - interval '6 hour'`,
+			expression:     `AND "createdAt" >= now() - interval '6hour'`,
 		},
 		{
 			name:           "Test with last two days period",
-			input:          types.Period{Value: "2 day"},
+			input:          types.Period{Value: "2day"},
 			expectedResult: LastTwoDaysSpec{},
-			expression:     `AND "createdAt" >= now() - interval '2 day'`,
+			expression:     `AND "createdAt" >= now() - interval '2day'`,
 		},
 		{
 			name:           "Test with last two weeks period",
-			input:          types.Period{Value: "14 day"},
+			input:          types.Period{Value: "14day"},
 			expectedResult: LastTwoWeeksSpec{},
-			expression:     `AND "createdAt" >= now() - interval '14 day'`,
+			expression:     `AND "createdAt" >= now() - interval '14day'`,
 		},
 		{
 			name:           "Test with last week period",
-			input:          types.Period{Value: "7 day"},
+			input:          types.Period{Value: "7day"},
 			expectedResult: LastWeeksSpec{},
-			expression:     `AND "createdAt" >= now() - interval '7 day'`,
+			expression:     `AND "createdAt" >= now() - interval '7day'`,
 		},
 	}
 

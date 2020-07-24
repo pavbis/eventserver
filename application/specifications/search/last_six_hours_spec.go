@@ -9,10 +9,10 @@ type LastSixHoursSpec struct{}
 
 // IsSatisfiedBy provides boolean value if spec satisfies
 func (l LastSixHoursSpec) IsSatisfiedBy(p *types.Period) bool {
-	return "6 hour" == p.Value
+	return "6hour" == p.Value
 }
 
 // AndExpression returns the and expression for sql query
 func (l LastSixHoursSpec) AndExpression() string {
-	return `AND "createdAt" >= now() - interval '6 hour'`
+	return `AND "createdAt" >= now() - interval '6hour'`
 }
