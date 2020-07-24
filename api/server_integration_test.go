@@ -147,7 +147,7 @@ func TestEventPeriodSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 }
 
 func TestEventPeriodSearchRequestHandlerWithQueryArgument(t *testing.T) {
-	req := authRequest(http.MethodPost, "/api/v1/event-period-search/maerz?period=6 hour", nil)
+	req := authRequest(http.MethodPost, "/api/v1/event-period-search/maerz?period=6hour", nil)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
