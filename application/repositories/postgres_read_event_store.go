@@ -3,6 +3,8 @@ package repositories
 import (
 	"bitbucket.org/pbisse/eventserver/application/specifications/search"
 	"bitbucket.org/pbisse/eventserver/application/types"
+	"database/sql"
+	"errors"
 	"fmt"
 )
 
@@ -111,4 +113,23 @@ SELECT COALESCE((SELECT json_agg(q) FROM (
 	row := p.sqlManager.QueryRow(query)
 
 	return scanOrFail(row)
+}
+
+func (p *postgresReadEventStore) ReadPayloadForEventId(eventId types.EventId) ([]byte, error) {
+	row := p.sqlManager.QueryRow(`SELECT e.event::jsonb as "payLoad"
+                    FROM events e
+                    WHERE e."eventId" = $1
+                    LIMIT 1`, eventId.UUID.String())
+
+	result, err := scanOrFail(row)
+
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return nil, errors.New("event id not found")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

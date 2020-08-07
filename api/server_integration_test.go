@@ -295,6 +295,45 @@ func TestUpdateConsumerOffsetWithValidParameters(t *testing.T) {
 	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
 }
 
+func TestGetEventPayloadWithInvalidEventIdProvided(t *testing.T) {
+	req := authRequest(http.MethodGet, "/api/v1/events/invalid-uuid/payload", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"missing or invalid event id provided")
+}
+
+func TestGetEventPayloadWithNotExistentUuid(t *testing.T) {
+	req := authRequest(http.MethodGet, "/api/v1/events/fa77e595-f86d-42c3-959f-cfb3e9c8830d/payload", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusNotFound, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"event id not found")
+}
+
+func TestGetEventPayloadWithExistentUuid(t *testing.T) {
+	payloadTwo, _ := readFileContent("testdata/input/receive_event.json")
+	receiveSecondEventReq := authRequest(http.MethodPost, "/api/v1/streams/integrationThree/events", bytes.NewBuffer(payloadTwo))
+	receiveSecondEventReq.Header.Add("X-Producer-ID", testProducerId)
+	receiveEventResponse := executeRequest(receiveSecondEventReq)
+
+	var m map[string]interface{}
+	_ = json.Unmarshal(receiveEventResponse.Body.Bytes(), &m)
+	// grab the created event id
+	eventId := m["uuid"]
+
+	req := authRequest(http.MethodGet, fmt.Sprintf("/api/v1/events/%s/payload", eventId), nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+}
+
 func authRequest(method string, url string, body io.Reader) *http.Request {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")

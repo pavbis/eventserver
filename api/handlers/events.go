@@ -107,3 +107,23 @@ func ReceiveEventsRequestHandler(db repositories.Executor, w http.ResponseWriter
 
 	respondWithJSON(w, http.StatusOK, result)
 }
+
+// ReadEventPayloadRequestHandler returns payload for specific event id
+func ReadEventPayloadRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
+	receiveEventPayloadRequest, err := input.NewReadEventPayloadRequest(r)
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	eventStore := repositories.NewPostgresReadEventStore(db)
+	result, err := eventStore.ReadPayloadForEventId(receiveEventPayloadRequest.EventId)
+
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	respond(w, http.StatusOK, result)
+}
