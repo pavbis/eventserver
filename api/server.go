@@ -82,6 +82,7 @@ func (s *Server) initializeRoutes() {
 	s.Post("/streams/{streamName}/events", s.handleRequest(handlers.ReceiveEventRequestHandler))
 	s.Post("/streams/{streamName}/events/{eventId}", s.handleRequest(handlers.ReceiveAcknowledgementRequestHandler))
 	s.Get("/streams/{streamName}/events", s.handleRequest(handlers.ReceiveEventsRequestHandler))
+	s.Post("/{streamName}/{consumerId}/{eventName}/change/{offset}", s.handleRequest(handlers.UpdateConsumerOffsetRequestHandler))
 
 	// Stats
 	s.Get("/consumers/{streamName}", s.handleRequest(handlers.ConsumersForStreamRequestHandler))

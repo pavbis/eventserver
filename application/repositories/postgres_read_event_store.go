@@ -37,7 +37,7 @@ WHERE "streamName" = $4
 ORDER BY "sequence"
 LIMIT $6
 `,
-q.ConsumerId.UUID.String(), q.EventName.Name, q.StreamName.Name, q.StreamName.Name, q.EventName.Name, q.MaxEventCount.Count)
+		q.ConsumerId.UUID.String(), q.EventName.Name, q.StreamName.Name, q.StreamName.Name, q.EventName.Name, q.MaxEventCount.Count)
 
 	if err != nil {
 		return nil, err

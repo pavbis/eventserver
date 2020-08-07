@@ -264,6 +264,37 @@ func TestMetricsEndPoint(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 }
 
+func TestUpdateConsumerOffsetWithInvalidOffset(t *testing.T) {
+	req := authRequest(http.MethodPost, "/api/v1/test-stream/2480b859-e08a-4414-9c7d-003bc1a4b555/connectSocket/change/invalidInt", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"offset argument is not valid")
+}
+
+func TestUpdateConsumerOffsetWithValidOffsetAndNotExistentStream(t *testing.T) {
+	req := authRequest(http.MethodPost, "/api/v1/missing-stream/2480b859-e08a-4414-9c7d-003bc1a4b555/connectSocket/change/2", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusInternalServerError, response.Code)
+	checkMessageValue(t,
+		response.Body.Bytes(),
+		"error",
+		"offset can not be greater than event count")
+}
+
+func TestUpdateConsumerOffsetWithValidParameters(t *testing.T) {
+	req := authRequest(http.MethodPost, "/api/v1/sandwich/2480b859-e08a-4414-9c7d-003bc1a4b221/Snickers/change/2", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+	expected := bytes.NewBufferString("successfully updated offset to 33 for consumer 2480b859-e08a-4414-9c7d-003bc1a4b221")
+	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
+}
+
 func authRequest(method string, url string, body io.Reader) *http.Request {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")

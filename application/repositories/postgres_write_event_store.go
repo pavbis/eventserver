@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"bitbucket.org/pbisse/eventserver/application/types"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -151,4 +152,59 @@ func (p *postgresWriteEventStore) getConsumerOffset(
 	}
 
 	return consumerOffset, nil
+}
+
+func (p *postgresWriteEventStore) UpdateConsumerOffset(
+	consumerId types.ConsumerId,
+	streamName types.StreamName,
+	eventName types.EventName,
+	newOffset types.ConsumerOffset) error {
+
+	eventCountForConsumerAndStream, err := p.countEventsForConsumerAndStream(streamName, consumerId, eventName)
+
+	if err != nil {
+		return err
+	}
+
+	if newOffset.Offset > eventCountForConsumerAndStream.Offset {
+		return errors.New("offset can not be greater than event count")
+	}
+
+	_, err = p.sqlManager.Exec(`UPDATE "consumerOffsets" 
+                SET 
+                    "offset" = $1,
+                    "movedAt" = now()
+                WHERE "consumerId" = $2
+                AND "eventName" = $3
+                AND "streamName" = $4`,
+		newOffset.Offset, consumerId.UUID.String(), eventName.Name, streamName.Name)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *postgresWriteEventStore) countEventsForConsumerAndStream(
+	streamName types.StreamName,
+	consumerId types.ConsumerId,
+	eventName types.EventName) (types.ConsumerOffset, error) {
+	var currentPossibleConsumerOffset types.ConsumerOffset
+
+	row := p.sqlManager.QueryRow(
+		`SELECT
+                COALESCE(COUNT(e."eventId"), 0)
+                FROM events e
+                LEFT JOIN "consumerOffsets" cO USING ("eventName", "streamName")
+                WHERE e."streamName" = $1
+                AND e."eventName" = $2
+                AND cO."consumerId" = $3`,
+		streamName.Name, eventName.Name, consumerId.UUID.String())
+
+	if err := row.Scan(&currentPossibleConsumerOffset.Offset); err != nil {
+		return currentPossibleConsumerOffset, err
+	}
+
+	return currentPossibleConsumerOffset, nil
 }
