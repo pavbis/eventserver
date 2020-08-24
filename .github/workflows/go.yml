@@ -11,6 +11,18 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+    
     steps:
 
     - name: Set up Go 1.x
@@ -32,6 +44,12 @@ jobs:
 
     - name: Build
       run: go build -v .
+   
+    - name: Set envs
+      run: export DATABASE_URL="user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable" AUTH_USER=test AUTH_PASS=test;
 
     - name: Test
       run: go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
+      
+    - name: Code coverage
+      run: go tool cover -func coverage.txt
