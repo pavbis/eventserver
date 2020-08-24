@@ -39,15 +39,20 @@ go_fmt:
 
 ## Run tests.
 run_tests:
-	go test -v -coverpkg=./... -coverprofile=coverage.log ./...
+	go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
 .PHONY: run_tests
 
 ## Show coverage.
 show_detailed_coverage:
-	go tool cover -func coverage.log
+	go tool cover -func coverage.txt
 .PHONY: show_detailed_coverage
 
 ## Build go binary.
 build_app:
-	docker-compose build app
+	docker-compose build --force-rm app
 .PHONY: build_app
+
+## Start containers.
+start_containers:
+	docker-compose up -d --remove-orphans
+.PHONY: start_containers

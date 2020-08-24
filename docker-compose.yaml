@@ -14,12 +14,7 @@ services:
     depends_on:
       - postgres
     environment:
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: testdb
-      DB_SSLMODE: disable
+      DATABASE_URL: "user=root password=root dbname=testdb host=postgres port=5432 sslmode=disable"
       AUTH_USER: test
       AUTH_PASS: test
 

@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-var a App
+var s Server
 
 var (
 	testConsumerId    = "2480b859-e08a-4414-9c7d-003bc1a4b555"
@@ -17,14 +17,14 @@ var (
 	invalidProducerID = "52a454e8-a111-4e5c-a715-2e46fedd8c48"
 )
 
-func initializeApp() {
-	a = App{}
-	a.Initialize()
+func initializeServer() {
+	s = Server{}
+	s.Initialize()
 }
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	a.Router.ServeHTTP(rr, req)
+	s.router.ServeHTTP(rr, req)
 
 	return rr
 }
@@ -69,7 +69,7 @@ func checkMessageValue(t *testing.T, body []byte, fieldName string, expected str
 func readFileAndExecuteQuery(filePath string) error {
 	query, _ := readFileContent(filePath)
 
-	if _, err := a.DB.Exec(string(query)); err != nil {
+	if _, err := s.db.Exec(string(query)); err != nil {
 		return err
 	}
 

@@ -1,17 +1,16 @@
 package repositories
 
 import (
-	"bitbucket.org/pbisse/eventserver/api/config"
 	"database/sql"
 	_ "github.com/lib/pq"
+	"os"
 	"testing"
 )
 
 func TestScannerError(t *testing.T) {
-	dsn := config.NewDsnFromEnv()
 	var err error
 	var db *sql.DB
-	db, err = sql.Open("postgres", dsn)
+	db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		panic(err)
 	}

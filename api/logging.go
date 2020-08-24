@@ -6,6 +6,6 @@ import (
 	"net/http"
 )
 
-func (a *App) createLoggingRouter(out io.Writer) http.Handler {
-	return handlers.LoggingHandler(out, a.Router)
+func (s *Server) createLoggingRouter(out io.Writer) http.Handler {
+	return handlers.LoggingHandler(out, s.router)
 }
