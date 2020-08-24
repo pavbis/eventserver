@@ -46,7 +46,7 @@ jobs:
       run: go build -v .
    
     - name: Set envs
-      run: export DATABASE_URL="user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable" AUTH_USER=test AUTH_PASS=test;
+      run: export DATABASE_URL="user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable AUTH_USER=test AUTH_PASS=test";
 
     - name: Test
       run: go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
