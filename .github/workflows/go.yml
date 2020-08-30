@@ -44,6 +44,15 @@ jobs:
 
     - name: Build
       run: go build -v .
+    
+    - name: Format code
+      run: gofmt -d ./
+    
+    - name: Download code metrics library
+      run: go get github.com/fzipp/gocyclo
+      
+    - name: Run code metrics
+      run: gocyclo -avg . 
       
     - name: Test
       run: go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
