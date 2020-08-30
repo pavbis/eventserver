@@ -3,6 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/bitbucket.org/pbisse/eventserver)](https://goreportcard.com/report/bitbucket.org/pbisse/eventserver)
 [![codecov](https://codecov.io/bb/pbisse/eventserver/branch/master/graph/badge.svg)](https://codecov.io/bb/pbisse/eventserver)
 [![made-with-go-1](https://img.shields.io/badge/Made%20with-go%20v.1.14-blue)](https://golang.org/)
+[![Actions Status](https://github.com/pavbis/eventserver/workflows/Go/badge.svg)](https://github.com/pavbis/eventserver/actions)
 
 
 # Event server
