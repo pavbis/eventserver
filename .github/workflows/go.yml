@@ -44,11 +44,11 @@ jobs:
 
     - name: Build
       run: go build -v .
-      env:
-        DATABASE_URL: user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable AUTH_USER=test AUTH_PASS=test
-
+      
     - name: Test
       run: go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
+      env:
+        DATABASE_URL: user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable AUTH_USER=test AUTH_PASS=test
       
     - name: Code coverage
       run: go tool cover -func coverage.txt
