@@ -1,7 +1,7 @@
 package search
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/types"
+	"github.com/pavbis/eventserver/application/types"
 )
 
 // LastWeeksSpec represents last week specification

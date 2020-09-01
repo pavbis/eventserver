@@ -1,11 +1,11 @@
 package repositories
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/specifications/search"
-	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/pavbis/eventserver/application/specifications/search"
+	"github.com/pavbis/eventserver/application/types"
 )
 
 type postgresReadEventStore struct {

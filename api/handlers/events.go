@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"bitbucket.org/pbisse/eventserver/api/input"
-	"bitbucket.org/pbisse/eventserver/application/repositories"
-	"bitbucket.org/pbisse/eventserver/application/types"
 	"encoding/json"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	"github.com/pavbis/eventserver/api/input"
+	"github.com/pavbis/eventserver/application/repositories"
+	"github.com/pavbis/eventserver/application/types"
 	"net/http"
 )
 

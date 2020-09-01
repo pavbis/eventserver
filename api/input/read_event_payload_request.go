@@ -1,9 +1,9 @@
 package input
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/types"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/pavbis/eventserver/application/types"
 	"net/http"
 )
 

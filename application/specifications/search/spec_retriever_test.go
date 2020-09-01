@@ -1,8 +1,8 @@
 package search
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/types"
 	"errors"
+	"github.com/pavbis/eventserver/application/types"
 	"testing"
 )
 

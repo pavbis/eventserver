@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"encoding/json"
+	"github.com/pavbis/eventserver/application/repositories"
 	"net/http"
 )
 

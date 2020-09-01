@@ -1,10 +1,10 @@
 package api
 
 import (
-	"bitbucket.org/pbisse/eventserver/api/handlers"
-	"bitbucket.org/pbisse/eventserver/application/metrics"
-	"bitbucket.org/pbisse/eventserver/application/repositories"
 	"database/sql"
+	"github.com/pavbis/eventserver/api/handlers"
+	"github.com/pavbis/eventserver/application/metrics"
+	"github.com/pavbis/eventserver/application/repositories"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"

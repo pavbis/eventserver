@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/pbisse/eventserver/api"
+	"github.com/pavbis/eventserver/api"
 )
 
 func main() {

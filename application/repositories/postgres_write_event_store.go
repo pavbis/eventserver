@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/types"
 	"errors"
 	"fmt"
+	"github.com/pavbis/eventserver/application/types"
 	"strings"
 )
 

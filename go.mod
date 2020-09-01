@@ -1,4 +1,4 @@
-module bitbucket.org/pbisse/eventserver
+module github.com/pavbis/eventserver
 
 go 1.14
 

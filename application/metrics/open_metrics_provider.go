@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/repositories"
+	"github.com/pavbis/eventserver/application/repositories"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

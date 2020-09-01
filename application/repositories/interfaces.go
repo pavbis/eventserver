@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/types"
 	"database/sql"
+	"github.com/pavbis/eventserver/application/types"
 )
 
 // MetricsData is the interface for metric operations

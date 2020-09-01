@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"bitbucket.org/pbisse/eventserver/application/types"
+	"github.com/pavbis/eventserver/application/types"
 )
 
 type postgresSearchStore struct {
