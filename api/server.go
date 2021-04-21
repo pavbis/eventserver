@@ -11,6 +11,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -57,7 +58,16 @@ func (s *Server) Initialize() {
 // Run runs the server on specific port
 func (s *Server) Run(addr string) {
 	loggedRouter := s.createLoggingRouter(s.logger.Writer())
-	s.logger.Fatal(http.ListenAndServe(addr, loggedRouter))
+
+	srv := &http.Server{
+		Handler:      loggedRouter,
+		Addr:         addr,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
+	s.logger.Fatal(srv.ListenAndServe())
 }
 
 // Health provides the /health route for load balancer health check

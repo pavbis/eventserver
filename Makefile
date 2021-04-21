@@ -28,24 +28,14 @@ help:
 # Useful targets #
 ##################
 
-## Run all quality assurance tools (tests and code inspection).
-qa: go_fmt run_tests
-.PHONY: qa
+## Run golang ci lint with all linters.
+go_lint_all:
+	docker-compose run --rm linter golangci-lint run -v
+.PHONY: go_lint_all
 
-## Run go fmt.
-go_fmt:
-	gofmt -d ./
-.PHONY: go_fmt
-
-## Run tests.
-run_tests:
-	go test -v -coverpkg=./... -coverprofile=coverage.txt ./...
-.PHONY: run_tests
-
-## Show coverage.
-show_detailed_coverage:
-	go tool cover -func coverage.txt
-.PHONY: show_detailed_coverage
+## Build app and start containers
+build_app_and_start: build_app start_containers
+.PHONY: build_app_and_start
 
 ## Build go binary.
 build_app:
@@ -54,5 +44,17 @@ build_app:
 
 ## Start containers.
 start_containers:
-	docker-compose up -d --remove-orphans
-.PHONY: start_containers
+	docker-compose up -d --force-recreate --remove-orphans
+.PHONY: start_container
+
+## Run tests with coverage.
+run_tests_with_coverage:
+	DATABASE_URL="user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable" go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
+	go tool cover -func coverage.txt
+.PHONY: run_tests_with_coverage
+
+## Run tests with coverage.
+run_tests_and_open_coverage:
+	DATABASE_URL="user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable" go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
+	go tool cover -html=coverage.txt
+.PHONY: run_tests_with_coverage
