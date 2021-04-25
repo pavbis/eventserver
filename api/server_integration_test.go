@@ -44,7 +44,7 @@ func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
 	expected, _ := readFileContent("testdata/output/stats/events_per_stream/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
+	checkResponseBody(t, response.Body.String(), string(expected[:]))
 }
 
 func TestReceiveEventsWithoutQueryParametersValidHeaders(t *testing.T) {
@@ -78,7 +78,7 @@ func TestReceiveEventsWithValidParameters(t *testing.T) {
 	expected, _ := readFileContent("testdata/output/receive_events/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
+	checkResponseBody(t, response.Body.String(), string(expected[:]))
 }
 
 func TestReceiveEventsWithValidParametersReturnsEmptyResult(t *testing.T) {
@@ -87,7 +87,7 @@ func TestReceiveEventsWithValidParametersReturnsEmptyResult(t *testing.T) {
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), []byte(`[]`))
+	checkResponseBody(t, response.Body.String(), "[]")
 }
 
 func TestConsumersForStreamRequestHandler(t *testing.T) {
@@ -96,7 +96,7 @@ func TestConsumersForStreamRequestHandler(t *testing.T) {
 	expected, _ := readFileContent("testdata/output/consumers_for_stream/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
+	checkResponseBody(t, response.Body.String(), string(expected[:]))
 }
 
 func TestReceiveStreamDataRequestHandler(t *testing.T) {
@@ -105,7 +105,7 @@ func TestReceiveStreamDataRequestHandler(t *testing.T) {
 	expected, _ := readFileContent("testdata/output/stats/stream_data/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
+	checkResponseBody(t, response.Body.String(), string(expected[:]))
 }
 
 func TestEventsForCurrentMonthRequestHandler(t *testing.T) {
@@ -132,7 +132,7 @@ func TestSearchRequestHandlerWithQueryArgument(t *testing.T) {
 	expected, _ := readFileContent("testdata/output/search/valid_response.json")
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	checkResponseBody(t, response.Body.Bytes(), expected)
+	checkResponseBody(t, response.Body.String(), string(expected[:]))
 }
 
 func TestEventPeriodSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
@@ -213,8 +213,8 @@ func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	expected := bytes.NewBufferString(fmt.Sprintf("Successfully moved offset to 1 for cosumer id %s", testConsumerId))
-	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
+
+	checkResponseBody(t, response.Body.String(), fmt.Sprintf(`"Successfully moved offset to 1 for cosumer id %s"`, testConsumerId))
 }
 
 func TestReceiveAcknowledgementRequestHandlerWithNotExistentEvent(t *testing.T) {
@@ -291,8 +291,7 @@ func TestUpdateConsumerOffsetWithValidParameters(t *testing.T) {
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	expected := bytes.NewBufferString("successfully updated offset to 33 for consumer 2480b859-e08a-4414-9c7d-003bc1a4b221")
-	checkResponseBody(t, response.Body.Bytes(), expected.Bytes())
+	checkResponseBody(t, response.Body.String(), `"successfully updated offset to 2 for consumer 2480b859-e08a-4414-9c7d-003bc1a4b221"`)
 }
 
 func TestGetEventPayloadWithInvalidEventIdProvided(t *testing.T) {

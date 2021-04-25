@@ -2,10 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 )
 
@@ -44,16 +44,9 @@ func readFileContent(filename string) ([]byte, error) {
 	return data, nil
 }
 
-func checkResponseBody(t *testing.T, body []byte, expected []byte) {
-	var m1 []interface{}
-	_ = json.Unmarshal(body, &m1)
-
-	var m2 []interface{}
-	_ = json.Unmarshal(expected, &m2)
-
-	if !reflect.DeepEqual(m1, m2) {
-		t.Errorf("\n %v. \n %v", m2, m1)
-	}
+// checks response body
+func checkResponseBody(t *testing.T, body string, expected string) {
+	require.JSONEq(t, body, expected)
 }
 
 func checkMessageValue(t *testing.T, body []byte, fieldName string, expected string) {
