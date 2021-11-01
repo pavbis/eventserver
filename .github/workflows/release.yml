@@ -10,8 +10,6 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: build
-        run: make build
       - name: version
         run: echo "::set-output name=version::$(./bin/azblogfilter --version)"
         id: version
