@@ -10,23 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-
-      - name: Extract version
-        id: data
-        run: |
-          # Strip git ref prefix from version
-          RELEASE_VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && RELEASE_VERSION=$(echo $RELEASE_VERSION | sed -e 's/^v//')
-          echo $RELEASE_VERSION
-          echo "##[set-output name=version;]$RELEASE_VERSION"
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+      - uses: actions/checkout@v2.2.0
         with:
-          name: Version ${{ steps.data.outputs.version }}
-          body_path: CHANGELOG.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: 1.0.0
+      - name: 'Get next minor version'
+        id: nexttag
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+      - name: Commit and tag v${{ steps.nexttag.outputs.tag }}
+        run: |
+          git config --global user.name 'automatic release'
+          git config --global user.email 'automatic.release@test.com'
+          git commit -am "Bumping version to ${{ steps.nexttag.outputs.tag }}"
+          git tag -a v${{ steps.nexttag.outputs.VERSION }} -m v${{ steps.nexttag.outputs.VERSION }}
+          git push --follow-tags
