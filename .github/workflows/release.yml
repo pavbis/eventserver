@@ -10,8 +10,10 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: build
-        run: make build
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: version
         run: echo "::set-output name=version::$(./bin/azblogfilter --version)"
         id: version
