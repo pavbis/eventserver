@@ -23,10 +23,10 @@ jobs:
         uses: "WyriHaximus/github-action-next-semvers@v1"
         with:
           version: ${{ steps.previoustag.outputs.tag }}
-      - name: Commit and tag v${{ steps.nexttag.outputs.tag }}
+      - name: Commit and tag v${{ steps.nexttag.outputs.patch }}
         run: |
           git config --global user.name 'automatic release'
           git config --global user.email 'automatic.release@test.com'
-          git commit -am "Bumping version to ${{ steps.nexttag.outputs.tag }}"
-          git tag -a v${{ steps.nexttag.outputs.VERSION }} -m v${{ steps.nexttag.outputs.VERSION }}
+          git commit -am "Bumping version to ${{ steps.nexttag.outputs.patch }}"
+          git tag -a v${{ steps.nexttag.outputs.patch }} -m v${{ steps.nexttag.outputs.patch }}
           git push --follow-tags
