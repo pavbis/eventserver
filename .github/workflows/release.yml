@@ -8,10 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v2
 
       - name: Extract version
