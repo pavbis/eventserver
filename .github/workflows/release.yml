@@ -10,30 +10,19 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: build
+        run: make build
+      - name: version
+        run: echo "::set-output name=version::$(./bin/azblogfilter --version)"
+        id: version
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Set POM_VERSION
-        run: echo "POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-      - name: Set ARTIFACT_VERSION
-        run: echo "ARTIFACT_VERSION=${POM_VERSION}-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Tag release
-        run: |
-          echo "Tagging branch with ${ARTIFACT_VERSION}."
-          git tag ${ARTIFACT_VERSION}
-          git push origin ${ARTIFACT_VERSION}
-      - name: Prepare new release version
-        run: |
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          NEW_VERSION=$(echo ${CURRENT_VERSION} | awk -F. '{ minor=$2+1; print $1"."minor"."$3}')
-          echo  "Old version: ${CURRENT_VERSION}"
-          echo  "New version: ${NEW_VERSION}"
-          mvn versions:set -DnewVersion=${NEW_VERSION}
-          git config --global user.email "paschabisse@gmail.com"
-          git config --global user.name "Release Bot"
-          git add .
-          git commit -m "set version for next release: ${NEW_VERSION}"
-          git push
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
