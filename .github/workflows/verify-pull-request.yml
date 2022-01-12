@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres:12
         env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: root
-          POSTGRES_DB: testdb
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s
@@ -50,8 +50,8 @@ jobs:
       run: go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
       env:
         DATABASE_URL: user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable
-        AUTH_USER: test
-        AUTH_PASS: test  
+        AUTH_USER: ${{ secrets.AUTH_USER }}
+        AUTH_PASS: ${{ secrets.AUTH_PASS }}
       
     - name: Code coverage
       run: go tool cover -func coverage.txt
