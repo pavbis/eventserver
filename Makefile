@@ -49,12 +49,12 @@ start_containers:
 
 ## Run tests with coverage.
 run_tests_with_coverage:
-	DATABASE_URL="user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable" go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
+	DATABASE_URL="user=root password=root dbname=testdb host=127.0.0.1 port=5432 sslmode=disable" go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
 	go tool cover -func coverage.txt
 .PHONY: run_tests_with_coverage
 
 ## Run tests with coverage.
 run_tests_and_open_coverage:
-	DATABASE_URL="user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable" go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
+	DATABASE_URL="user=root password=root dbname=testdb host=127.0.0.1 port=5432 sslmode=disable" go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
 	go tool cover -html=coverage.txt
 .PHONY: run_tests_with_coverage

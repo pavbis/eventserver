@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: []
 
+env:
+  GO_VERSION: 1.17.5
+
 jobs:
   lint:
     name: Lint
@@ -20,7 +23,7 @@ jobs:
     needs: [ lint ]
     services:
       postgres:
-        image: postgres:12
+        image: postgres:14
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
@@ -34,7 +37,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17.5
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2

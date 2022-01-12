@@ -19,7 +19,7 @@ services:
       AUTH_PASS: test
 
   postgres:
-    image: postgres:12
+    image: postgres:14
     container_name: event-server_postgres
     restart: always
     ports:
