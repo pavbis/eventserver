@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/pavbis/eventserver/application/repositories"
 	"net/http"
+
+	"github.com/pavbis/eventserver/application/repositories"
 )
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {

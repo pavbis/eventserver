@@ -1,27 +1,27 @@
 package repositories
 
-type postgresChartStore struct {
+type PostgresChartStore struct {
 	sqlManager Executor
 }
 
 // NewPostgresChartStore creates new instance of chart store
-func NewPostgresChartStore(sqlManger Executor) *postgresChartStore {
-	return &postgresChartStore{sqlManager: sqlManger}
+func NewPostgresChartStore(sqlManger Executor) *PostgresChartStore {
+	return &PostgresChartStore{sqlManager: sqlManger}
 }
 
-func (c *postgresChartStore) EventsChartData() ([]byte, error) {
+func (c *PostgresChartStore) EventsChartData() ([]byte, error) {
 	row := c.sqlManager.QueryRow(`SELECT COALESCE(stream_chart_data(), '[]')`)
 
 	return scanOrFail(row)
 }
 
-func (c *postgresChartStore) StreamChartData() ([]byte, error) {
+func (c *PostgresChartStore) StreamChartData() ([]byte, error) {
 	row := c.sqlManager.QueryRow(`SELECT COALESCE(stream_stats_data(), '[]')`)
 
 	return scanOrFail(row)
 }
 
-func (c *postgresChartStore) EventsForCurrentMonth() ([]byte, error) {
+func (c *PostgresChartStore) EventsForCurrentMonth() ([]byte, error) {
 	row := c.sqlManager.QueryRow(`SELECT events_for_current_month()`)
 
 	return scanOrFail(row)

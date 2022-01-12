@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/pavbis/eventserver/api/input"
 	"github.com/pavbis/eventserver/application/repositories"
 	"github.com/pavbis/eventserver/application/types"
-	"net/http"
 )
 
 // ConsumersForStreamRequestHandler provides consumers for all streams

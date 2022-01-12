@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/pavbis/eventserver/api/input"
 	"github.com/pavbis/eventserver/application/repositories"
 	"github.com/pavbis/eventserver/application/specifications/search"
 	"github.com/pavbis/eventserver/application/types"
-	"net/http"
 )
 
 // SearchRequestHandler provides search results for giv search term

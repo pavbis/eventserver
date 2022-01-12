@@ -2,9 +2,10 @@ package repositories
 
 import (
 	"database/sql"
-	_ "github.com/lib/pq"
 	"os"
 	"testing"
+
+	_ "github.com/lib/pq"
 )
 
 func TestScannerError(t *testing.T) {

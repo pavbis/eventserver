@@ -1,19 +1,20 @@
 package input
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
-type consumerForStreamInput struct {
+type ConsumerForStreamInput struct {
 	StreamName string `validate:"required"`
 }
 
 // NewConsumerForStreamInputFromRequest creates valid consumer for stream input
-func NewConsumerForStreamInputFromRequest(r *http.Request) *consumerForStreamInput {
+func NewConsumerForStreamInputFromRequest(r *http.Request) *ConsumerForStreamInput {
 	vars := mux.Vars(r)
 
-	return &consumerForStreamInput{
+	return &ConsumerForStreamInput{
 		StreamName: vars["streamName"],
 	}
 }

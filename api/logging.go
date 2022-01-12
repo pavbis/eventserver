@@ -1,9 +1,10 @@
 package api
 
 import (
-	"github.com/gorilla/handlers"
 	"io"
 	"net/http"
+
+	"github.com/gorilla/handlers"
 )
 
 func (s *Server) createLoggingRouter(out io.Writer) http.Handler {

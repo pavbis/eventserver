@@ -4,20 +4,21 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/pavbis/eventserver/application/specifications/search"
 	"github.com/pavbis/eventserver/application/types"
 )
 
-type postgresReadEventStore struct {
+type PostgresReadEventStore struct {
 	sqlManager Executor
 }
 
 // NewPostgresReadEventStore creates new instance of read event store
-func NewPostgresReadEventStore(sqlManger Executor) *postgresReadEventStore {
-	return &postgresReadEventStore{sqlManager: sqlManger}
+func NewPostgresReadEventStore(sqlManger Executor) *PostgresReadEventStore {
+	return &PostgresReadEventStore{sqlManager: sqlManger}
 }
 
-func (p *postgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*types.Event, error) {
+func (p *PostgresReadEventStore) SelectEvents(q types.SelectEventsQuery) ([]*types.Event, error) {
 	rows, err := p.sqlManager.Query(
 		`
 WITH consumer_offset AS (
@@ -39,7 +40,7 @@ WHERE "streamName" = $4
 ORDER BY "sequence"
 LIMIT $6
 `,
-		q.ConsumerId.UUID.String(), q.EventName.Name, q.StreamName.Name, q.StreamName.Name, q.EventName.Name, q.MaxEventCount.Count)
+		q.ConsumerID.UUID.String(), q.EventName.Name, q.StreamName.Name, q.StreamName.Name, q.EventName.Name, q.MaxEventCount.Count)
 
 	if err != nil {
 		return nil, err
@@ -51,19 +52,19 @@ LIMIT $6
 
 	for rows.Next() {
 		event := new(types.Event)
-		var eventId string
-		if err := rows.Scan(&eventId, &event); err != nil {
+		var eventID string
+		if err := rows.Scan(&eventID, &event); err != nil {
 			return nil, err
 		}
 
-		event.EventId = eventId
+		event.EventID = eventID
 		events = append(events, event)
 	}
 
 	return events, nil
 }
 
-func (p *postgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([]byte, error) {
+func (p *PostgresReadEventStore) SelectConsumersForStream(s types.StreamName) ([]byte, error) {
 	row := p.sqlManager.QueryRow(
 		`
 SELECT COALESCE((SELECT json_agg(c) FROM (
@@ -83,7 +84,7 @@ SELECT COALESCE((SELECT json_agg(c) FROM (
 	return scanOrFail(row)
 }
 
-func (p *postgresReadEventStore) SelectEventsInStreamForPeriod(s types.StreamName, spec search.SpecifiesPeriod) ([]byte, error) {
+func (p *PostgresReadEventStore) SelectEventsInStreamForPeriod(s types.StreamName, spec search.SpecifiesPeriod) ([]byte, error) {
 	query := fmt.Sprintf(`
 WITH found_events AS (
     SELECT
@@ -115,11 +116,11 @@ SELECT COALESCE((SELECT json_agg(q) FROM (
 	return scanOrFail(row)
 }
 
-func (p *postgresReadEventStore) ReadPayloadForEventId(eventId types.EventId) ([]byte, error) {
+func (p *PostgresReadEventStore) ReadPayloadForEventID(eventID types.EventID) ([]byte, error) {
 	row := p.sqlManager.QueryRow(`SELECT e.event::jsonb as "payLoad"
                     FROM events e
                     WHERE e."eventId" = $1
-                    LIMIT 1`, eventId.UUID.String())
+                    LIMIT 1`, eventID.UUID.String())
 
 	result, err := scanOrFail(row)
 

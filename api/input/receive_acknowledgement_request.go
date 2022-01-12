@@ -1,35 +1,36 @@
 package input
 
 import (
+	"net/http"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
-type receiveAcknowledgement struct {
-	ConsumerId uuid.UUID
+type ReceiveAcknowledgement struct {
+	ConsumerID uuid.UUID
 	StreamName string
-	EventId    uuid.UUID
+	EventID    uuid.UUID
 }
 
 // NewReceiveAcknowledgementFromRequest create new valid instance from input data
-func NewReceiveAcknowledgementFromRequest(r *http.Request) (*receiveAcknowledgement, error) {
+func NewReceiveAcknowledgementFromRequest(r *http.Request) (*ReceiveAcknowledgement, error) {
 	vars := mux.Vars(r)
-	consumerId, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))
+	consumerID, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))
 
 	if err != nil {
-		return nil, ErrConsumerId
+		return nil, ErrConsumerID
 	}
 
-	eventId, err := uuid.Parse(vars["eventId"])
+	eventID, err := uuid.Parse(vars["eventId"])
 
 	if err != nil {
-		return nil, ErrEventId
+		return nil, ErrEventID
 	}
 
-	return &receiveAcknowledgement{
-		ConsumerId: consumerId,
+	return &ReceiveAcknowledgement{
+		ConsumerID: consumerID,
 		StreamName: vars["streamName"],
-		EventId:    eventId,
+		EventID:    eventID,
 	}, nil
 }

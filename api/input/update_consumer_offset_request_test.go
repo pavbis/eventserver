@@ -15,7 +15,7 @@ func TestUpdateConsumerOffsetRequestErrors(t *testing.T) {
 		{
 			name:           "Test with invalid consumer id",
 			input:          http.Request{},
-			expectedResult: ErrConsumerId,
+			expectedResult: ErrConsumerID,
 		},
 	}
 
