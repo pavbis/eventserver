@@ -68,7 +68,7 @@ func TestReceiveEventsWithoutEventNameQueryParameter(t *testing.T) {
 	checkMessageValue(t,
 		response.Body.Bytes(),
 		"error",
-		"Key: 'receiveEvents.EventName' Error:Field validation for 'EventName' failed on the 'required' tag")
+		"Key: 'ReceiveEvents.EventName' Error:Field validation for 'EventName' failed on the 'required' tag")
 }
 
 func TestReceiveEventsWithValidParameters(t *testing.T) {
@@ -123,7 +123,7 @@ func TestSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 	checkMessageValue(t,
 		response.Body.Bytes(),
 		"error",
-		"Key: 'searchTermRequest.Term' Error:Field validation for 'Term' failed on the 'required' tag")
+		"Key: 'SearchTermRequest.Term' Error:Field validation for 'Term' failed on the 'required' tag")
 }
 
 func TestSearchRequestHandlerWithQueryArgument(t *testing.T) {
@@ -161,7 +161,7 @@ func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {
 	checkMessageValue(t,
 		response.Body.Bytes(),
 		"error",
-		"Key: 'receiveEventRequest.XProducerId' Error:Field validation for 'XProducerId' failed on the 'required' tag")
+		"Key: 'ReceiveEventRequest.XProducerID' Error:Field validation for 'XProducerID' failed on the 'required' tag")
 }
 
 func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
