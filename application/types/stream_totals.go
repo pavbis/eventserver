@@ -3,6 +3,6 @@ package types
 // StreamTotals represents stream totals
 type StreamTotals struct {
 	StreamName
-	ProducerId
+	ProducerID
 	EventCount float64
 }

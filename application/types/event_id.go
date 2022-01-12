@@ -2,7 +2,7 @@ package types
 
 import "github.com/google/uuid"
 
-// EventId represents event id
-type EventId struct {
+// EventID represents event id
+type EventID struct {
 	UUID uuid.UUID `json:"uuid"`
 }

@@ -33,7 +33,7 @@ type Payload map[string]interface{}
 
 // Event represents event
 type Event struct {
-	EventId   string `json:"eventId"`
+	EventID   string `json:"eventId"`
 	EventData `json:"event"`
 	System    `json:"system"`
 	Trigger   `json:"trigger"`

@@ -42,12 +42,12 @@ func TestReceiveEventsWithInvalidConsumerIdHeader(t *testing.T) {
 		{
 			name:           "Test with missing consumer id header",
 			request:        requestWithoutHeader(),
-			expectedResult: ErrConsumerId,
+			expectedResult: ErrConsumerID,
 		},
 		{
 			name:           "Test with invalid consumer id",
 			request:        requestWithInvalidHeader(),
-			expectedResult: ErrConsumerId,
+			expectedResult: ErrConsumerID,
 		},
 	}
 

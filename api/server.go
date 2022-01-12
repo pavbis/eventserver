@@ -2,18 +2,19 @@ package api
 
 import (
 	"database/sql"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/gorilla/mux"
 	"github.com/pavbis/eventserver/api/handlers"
 	"github.com/pavbis/eventserver/application/metrics"
 	"github.com/pavbis/eventserver/application/repositories"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"log"
-	"net/http"
-	_ "net/http/pprof"
-	"os"
-	"time"
 
-	"github.com/gorilla/mux"
+	// nolint: goimports
 	_ "github.com/lib/pq"
 )
 

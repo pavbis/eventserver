@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/pavbis/eventserver/api/input"
 	"github.com/pavbis/eventserver/application/repositories"
 	"github.com/pavbis/eventserver/application/types"
-	"net/http"
 )
 
 // ReceiveEventRequestHandler handles receiving of event
@@ -36,12 +37,12 @@ func ReceiveEventRequestHandler(db repositories.Executor, w http.ResponseWriter,
 		return
 	}
 
-	event.EventId = uuid.New().String()
+	event.EventID = uuid.New().String()
 
-	producerId := types.ProducerId{UUID: receiveEventRequest.XProducerId}
+	producerID := types.ProducerID{UUID: receiveEventRequest.XProducerID}
 	streamName := types.StreamName{Name: receiveEventRequest.StreamName}
 	eventStore := repositories.NewPostgresWriteEventStore(db)
-	result, err := eventStore.RecordEvent(producerId, streamName, event)
+	result, err := eventStore.RecordEvent(producerID, streamName, event)
 
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
@@ -60,12 +61,12 @@ func ReceiveAcknowledgementRequestHandler(db repositories.Executor, w http.Respo
 		return
 	}
 
-	consumerId := types.ConsumerId{UUID: receiveAcknowledgementRequest.ConsumerId}
+	consumerID := types.ConsumerID{UUID: receiveAcknowledgementRequest.ConsumerID}
 	streamName := types.StreamName{Name: receiveAcknowledgementRequest.StreamName}
-	eventId := types.EventId{UUID: receiveAcknowledgementRequest.EventId}
+	eventID := types.EventID{UUID: receiveAcknowledgementRequest.EventID}
 
 	eventStore := repositories.NewPostgresWriteEventStore(db)
-	result, err := eventStore.AcknowledgeEvent(consumerId, streamName, eventId)
+	result, err := eventStore.AcknowledgeEvent(consumerID, streamName, eventID)
 
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
@@ -91,7 +92,7 @@ func ReceiveEventsRequestHandler(db repositories.Executor, w http.ResponseWriter
 	}
 
 	selectEventsQuery := types.SelectEventsQuery{
-		ConsumerId:    types.ConsumerId{UUID: receiveEventsRequest.ConsumerId},
+		ConsumerID:    types.ConsumerID{UUID: receiveEventsRequest.ConsumerID},
 		StreamName:    types.StreamName{Name: receiveEventsRequest.StreamName},
 		EventName:     types.EventName{Name: receiveEventsRequest.EventName},
 		MaxEventCount: types.MaxEventCount{Count: receiveEventsRequest.Limit},
@@ -118,7 +119,7 @@ func ReadEventPayloadRequestHandler(db repositories.Executor, w http.ResponseWri
 	}
 
 	eventStore := repositories.NewPostgresReadEventStore(db)
-	result, err := eventStore.ReadPayloadForEventId(receiveEventPayloadRequest.EventId)
+	result, err := eventStore.ReadPayloadForEventID(receiveEventPayloadRequest.EventID)
 
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())

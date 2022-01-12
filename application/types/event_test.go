@@ -30,9 +30,9 @@ func TestEvent_Value(t *testing.T) {
    }
 }`
 	decoder := json.NewDecoder(strings.NewReader(payload))
-	eventId := "a8bae54a-7fdc-483b-8c8f-dc8e6edbdc83"
+	eventID := "a8bae54a-7fdc-483b-8c8f-dc8e6edbdc83"
 	_ = decoder.Decode(&event)
-	event.EventId = eventId
+	event.EventID = eventID
 	eventValue, _ := event.Value()
 	resultType := reflect.TypeOf(eventValue).Kind()
 

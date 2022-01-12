@@ -1,25 +1,26 @@
 package input
 
 import (
+	"net/http"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/pavbis/eventserver/application/types"
-	"net/http"
 )
 
-type readEventPayloadRequest struct {
-	types.EventId
+type ReadEventPayloadRequest struct {
+	types.EventID
 }
 
 // NewReadEventPayloadRequest creates valid read event payload input
-func NewReadEventPayloadRequest(r *http.Request) (*readEventPayloadRequest, error) {
+func NewReadEventPayloadRequest(r *http.Request) (*ReadEventPayloadRequest, error) {
 	vars := mux.Vars(r)
 
-	eventId, err := uuid.Parse(vars["eventId"])
+	eventID, err := uuid.Parse(vars["eventId"])
 
 	if err != nil {
-		return nil, ErrEventId
+		return nil, ErrEventID
 	}
 
-	return &readEventPayloadRequest{EventId: types.EventId{UUID: eventId}}, nil
+	return &ReadEventPayloadRequest{EventID: types.EventID{UUID: eventID}}, nil
 }

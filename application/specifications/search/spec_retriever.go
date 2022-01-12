@@ -2,10 +2,11 @@ package search
 
 import (
 	"errors"
+
 	"github.com/pavbis/eventserver/application/types"
 )
 
-type specRetriever struct {
+type SpecRetriever struct {
 	Specifications []SpecifiesPeriod
 }
 
@@ -13,12 +14,12 @@ type specRetriever struct {
 var ErrInvalidPeriod = errors.New("period is not supported or invalid")
 
 // NewSpecRetriever creates new instance of spec retriever
-func NewSpecRetriever(specs []SpecifiesPeriod) *specRetriever {
-	return &specRetriever{Specifications: specs}
+func NewSpecRetriever(specs []SpecifiesPeriod) *SpecRetriever {
+	return &SpecRetriever{Specifications: specs}
 }
 
 // FindSpec finds the specification or returns the ErrInvalidPeriod
-func (sl *specRetriever) FindSpec(period *types.Period) (SpecifiesPeriod, error) {
+func (sl *SpecRetriever) FindSpec(period *types.Period) (SpecifiesPeriod, error) {
 	for _, spec := range sl.Specifications {
 		if spec.IsSatisfiedBy(period) {
 			return spec, nil

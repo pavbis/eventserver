@@ -5,7 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type openMetricsCollector struct {
+type OpenMetricsCollector struct {
 	metricsStorage    repositories.MetricsData
 	streams           *prometheus.Desc
 	eventsInStream    *prometheus.Desc
@@ -14,8 +14,8 @@ type openMetricsCollector struct {
 }
 
 // NewOpenMetricsCollector creates new instance of the metrics collector
-func NewOpenMetricsCollector(s repositories.MetricsData) *openMetricsCollector {
-	return &openMetricsCollector{
+func NewOpenMetricsCollector(s repositories.MetricsData) *OpenMetricsCollector {
+	return &OpenMetricsCollector{
 		metricsStorage:    s,
 		streams:           newStreamsMetric(),
 		eventsInStream:    newEventsInStreamMetric(),
@@ -24,17 +24,32 @@ func NewOpenMetricsCollector(s repositories.MetricsData) *openMetricsCollector {
 	}
 }
 
-func (o *openMetricsCollector) Describe(channel chan<- *prometheus.Desc) {
+func (o *OpenMetricsCollector) Describe(channel chan<- *prometheus.Desc) {
 	channel <- o.streams
 	channel <- o.consumersOffsets
 	channel <- o.eventsInStream
 	channel <- o.consumersInStream
 }
 
-func (o *openMetricsCollector) Collect(channel chan<- prometheus.Metric) {
+func (o *OpenMetricsCollector) Collect(channel chan<- prometheus.Metric) {
 	streamsTotal, err := o.metricsStorage.StreamsTotal()
+
+	if err != nil {
+		return
+	}
+
 	eventsInStream, err := o.metricsStorage.EventsInStreamsWithOwner()
+
+	if err != nil {
+		return
+	}
+
 	consumersInStream, err := o.metricsStorage.ConsumersInStream()
+
+	if err != nil {
+		return
+	}
+
 	consumersOffsets, err := o.metricsStorage.ConsumersOffsets()
 
 	if err != nil {
@@ -47,7 +62,7 @@ func (o *openMetricsCollector) Collect(channel chan<- prometheus.Metric) {
 		channel <- prometheus.MustNewConstMetric(
 			o.eventsInStream,
 			prometheus.CounterValue,
-			streamTotals.EventCount, streamTotals.ProducerId.UUID, streamTotals.StreamName.Name)
+			streamTotals.EventCount, streamTotals.ProducerID.UUID, streamTotals.StreamName.Name)
 	}
 
 	for _, consumer := range consumersInStream {
@@ -59,6 +74,6 @@ func (o *openMetricsCollector) Collect(channel chan<- prometheus.Metric) {
 		channel <- prometheus.MustNewConstMetric(
 			o.consumersOffsets,
 			prometheus.GaugeValue,
-			consumer.ConsumerOffset, consumer.StreamName.Name, consumer.ConsumerId.UUID.String(), consumer.EventName.Name)
+			consumer.ConsumerOffset, consumer.StreamName.Name, consumer.ConsumerID.UUID.String(), consumer.EventName.Name)
 	}
 }

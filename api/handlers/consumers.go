@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/pavbis/eventserver/api/input"
 	"github.com/pavbis/eventserver/application/repositories"
-	"net/http"
 )
 
-// ReceiveEventsRequestHandler returns event for provided stream
+// UpdateConsumerOffsetRequestHandler returns event for provided stream
 func UpdateConsumerOffsetRequestHandler(db repositories.Executor, w http.ResponseWriter, r *http.Request) {
 	updateConsumerOffsetRequest, err := input.NewUpdateConsumerOffsetRequest(r)
 
@@ -18,7 +19,7 @@ func UpdateConsumerOffsetRequestHandler(db repositories.Executor, w http.Respons
 
 	eventStore := repositories.NewPostgresWriteEventStore(db)
 	err = eventStore.UpdateConsumerOffset(
-		updateConsumerOffsetRequest.ConsumerId,
+		updateConsumerOffsetRequest.ConsumerID,
 		updateConsumerOffsetRequest.StreamName,
 		updateConsumerOffsetRequest.EventName,
 		updateConsumerOffsetRequest.ConsumerOffset)
@@ -30,7 +31,7 @@ func UpdateConsumerOffsetRequestHandler(db repositories.Executor, w http.Respons
 
 	result := fmt.Sprintf(
 		"successfully updated offset to %d for consumer %s",
-		updateConsumerOffsetRequest.Offset, updateConsumerOffsetRequest.ConsumerId.UUID.String())
+		updateConsumerOffsetRequest.Offset, updateConsumerOffsetRequest.ConsumerID.UUID.String())
 
 	respondWithJSON(w, http.StatusOK, result)
 }

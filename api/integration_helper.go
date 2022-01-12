@@ -2,18 +2,19 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var s Server
 
 var (
-	testConsumerId    = "2480b859-e08a-4414-9c7d-003bc1a4b555"
-	testProducerId    = "52a454e8-a111-4e5c-a715-2e46fedd8c47"
+	testConsumerID    = "2480b859-e08a-4414-9c7d-003bc1a4b555"
+	testProducerID    = "52a454e8-a111-4e5c-a715-2e46fedd8c47"
 	invalidProducerID = "52a454e8-a111-4e5c-a715-2e46fedd8c48"
 )
 

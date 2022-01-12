@@ -2,8 +2,9 @@ package search
 
 import (
 	"errors"
-	"github.com/pavbis/eventserver/application/types"
 	"testing"
+
+	"github.com/pavbis/eventserver/application/types"
 )
 
 func TestSpecRetrieverError(t *testing.T) {

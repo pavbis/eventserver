@@ -4,13 +4,13 @@ import (
 	"net/http"
 )
 
-type searchTermRequest struct {
+type SearchTermRequest struct {
 	Term string `validate:"required"`
 }
 
 // NewSearchTermInputFromRequest create a valid instance of search term
-func NewSearchTermInputFromRequest(r *http.Request) *searchTermRequest {
+func NewSearchTermInputFromRequest(r *http.Request) *SearchTermRequest {
 	searchTerm := r.URL.Query().Get("_q")
 
-	return &searchTermRequest{Term: searchTerm}
+	return &SearchTermRequest{Term: searchTerm}
 }

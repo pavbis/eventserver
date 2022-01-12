@@ -1,28 +1,29 @@
 package input
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/pavbis/eventserver/application/types"
-	"net/http"
-	"strconv"
 )
 
-type receiveConsumerOffsetRequest struct {
-	types.ConsumerId
+type ReceiveConsumerOffsetRequest struct {
+	types.ConsumerID
 	types.EventName
 	types.ConsumerOffset
 	types.StreamName
 }
 
 // NewUpdateConsumerOffsetRequest creates valid update consumer offset input
-func NewUpdateConsumerOffsetRequest(r *http.Request) (*receiveConsumerOffsetRequest, error) {
+func NewUpdateConsumerOffsetRequest(r *http.Request) (*ReceiveConsumerOffsetRequest, error) {
 	vars := mux.Vars(r)
 
-	consumerId, err := uuid.Parse(vars["consumerId"])
+	consumerID, err := uuid.Parse(vars["consumerId"])
 
 	if err != nil {
-		return nil, ErrConsumerId
+		return nil, ErrConsumerID
 	}
 
 	offset, err := strconv.Atoi(vars["offset"])
@@ -31,8 +32,8 @@ func NewUpdateConsumerOffsetRequest(r *http.Request) (*receiveConsumerOffsetRequ
 		return nil, ErrConsumerOffset
 	}
 
-	return &receiveConsumerOffsetRequest{
-		ConsumerId:     types.ConsumerId{UUID: consumerId},
+	return &ReceiveConsumerOffsetRequest{
+		ConsumerID:     types.ConsumerID{UUID: consumerID},
 		EventName:      types.EventName{Name: vars["eventName"]},
 		ConsumerOffset: types.ConsumerOffset{Offset: offset},
 		StreamName:     types.StreamName{Name: vars["streamName"]},

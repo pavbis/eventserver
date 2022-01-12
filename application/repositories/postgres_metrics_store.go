@@ -4,16 +4,16 @@ import (
 	"github.com/pavbis/eventserver/application/types"
 )
 
-type postgresMetricsStore struct {
+type PostgresMetricsStore struct {
 	sqlManager Executor
 }
 
 // NewPostgresMetricsStore creates the new instance of postgres metrics store
-func NewPostgresMetricsStore(sqlManger Executor) *postgresMetricsStore {
-	return &postgresMetricsStore{sqlManager: sqlManger}
+func NewPostgresMetricsStore(sqlManger Executor) *PostgresMetricsStore {
+	return &PostgresMetricsStore{sqlManager: sqlManger}
 }
 
-func (p *postgresMetricsStore) StreamsTotal() (types.StreamCount, error) {
+func (p *PostgresMetricsStore) StreamsTotal() (types.StreamCount, error) {
 	var streamCount types.StreamCount
 
 	row := p.sqlManager.QueryRow(
@@ -27,7 +27,7 @@ func (p *postgresMetricsStore) StreamsTotal() (types.StreamCount, error) {
 	return streamCount, nil
 }
 
-func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals, error) {
+func (p *PostgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals, error) {
 	rows, err := p.sqlManager.Query(`
 			SELECT
 				pSR."streamName",
@@ -45,7 +45,7 @@ func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals
 
 	for rows.Next() {
 		streamTotal := new(types.StreamTotals)
-		if err := rows.Scan(&streamTotal.StreamName.Name, &streamTotal.ProducerId.UUID, &streamTotal.EventCount); err != nil {
+		if err := rows.Scan(&streamTotal.StreamName.Name, &streamTotal.ProducerID.UUID, &streamTotal.EventCount); err != nil {
 			return nil, err
 		}
 
@@ -55,7 +55,7 @@ func (p *postgresMetricsStore) EventsInStreamsWithOwner() ([]*types.StreamTotals
 	return streamTotals, nil
 }
 
-func (p *postgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, error) {
+func (p *PostgresMetricsStore) ConsumersInStream() ([]*types.ConsumerTotals, error) {
 	rows, err := p.sqlManager.Query(`
 SELECT
 	cOF."streamName",
@@ -84,7 +84,7 @@ GROUP BY cOF."streamName"
 	return consumerTotals, nil
 }
 
-func (p *postgresMetricsStore) ConsumersOffsets() ([]*types.ConsumerOffsetData, error) {
+func (p *PostgresMetricsStore) ConsumersOffsets() ([]*types.ConsumerOffsetData, error) {
 	rows, err := p.sqlManager.Query(`
 SELECT
 	cOF."consumerId",
@@ -105,7 +105,7 @@ ORDER BY "streamName"
 
 	for rows.Next() {
 		consumer := new(types.ConsumerOffsetData)
-		if err := rows.Scan(&consumer.ConsumerId.UUID, &consumer.StreamName.Name, &consumer.ConsumerOffset, &consumer.EventName.Name); err != nil {
+		if err := rows.Scan(&consumer.ConsumerID.UUID, &consumer.StreamName.Name, &consumer.ConsumerOffset, &consumer.EventName.Name); err != nil {
 			return nil, err
 		}
 

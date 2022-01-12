@@ -3,40 +3,41 @@ package repositories
 import (
 	"errors"
 	"fmt"
-	"github.com/pavbis/eventserver/application/types"
 	"strings"
+
+	"github.com/pavbis/eventserver/application/types"
 )
 
-type postgresWriteEventStore struct {
+type PostgresWriteEventStore struct {
 	sqlManager Executor
 }
 
 // NewPostgresWriteEventStore creates the new instance of postgres write event store
-func NewPostgresWriteEventStore(sqlManger Executor) *postgresWriteEventStore {
-	return &postgresWriteEventStore{sqlManager: sqlManger}
+func NewPostgresWriteEventStore(sqlManger Executor) *PostgresWriteEventStore {
+	return &PostgresWriteEventStore{sqlManager: sqlManger}
 }
 
-func (p *postgresWriteEventStore) RecordEvent(
-	producerId types.ProducerId,
+func (p *PostgresWriteEventStore) RecordEvent(
+	producerID types.ProducerID,
 	streamName types.StreamName,
-	event types.Event) (types.EventId, error) {
-	relatedProducerId := p.getProducerIdForStreamName(streamName)
+	event types.Event) (types.EventID, error) {
+	relatedProducerID := p.getProducerIDForStreamName(streamName)
 
-	var eventId types.EventId
+	var eventID types.EventID
 	var err error
 
-	if relatedProducerId.UUID == "" {
-		p.saveProducerStreamRelation(producerId, streamName)
-		relatedProducerId.UUID = producerId.UUID
+	if relatedProducerID.UUID == "" {
+		p.saveProducerStreamRelation(producerID, streamName)
+		relatedProducerID.UUID = producerID.UUID
 	}
 
 	if err := p.createSequence(streamName, event.EventData.Name); err != nil {
-		return eventId, err
+		return eventID, err
 	}
 
-	if relatedProducerId.UUID != producerId.UUID {
-		err := fmt.Errorf(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerId.UUID))
-		return eventId, err
+	if relatedProducerID.UUID != producerID.UUID {
+		err := fmt.Errorf(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerID.UUID))
+		return eventID, err
 	}
 
 	query := fmt.Sprintf(`INSERT INTO "events" ("streamName", "eventName", "sequence", "eventId", "event")
@@ -44,30 +45,30 @@ func (p *postgresWriteEventStore) RecordEvent(
 
 	err = p.sqlManager.QueryRow(
 		query,
-		streamName.Name, event.EventData.Name, event.EventId, event.ToJSON()).Scan(&eventId.UUID)
+		streamName.Name, event.EventData.Name, event.EventID, event.ToJSON()).Scan(&eventID.UUID)
 
 	if err != nil {
-		return eventId, err
+		return eventID, err
 	}
 
-	return eventId, nil
+	return eventID, nil
 }
 
-func (p *postgresWriteEventStore) getProducerIdForStreamName(streamName types.StreamName) types.ProducerId {
-	var producerId types.ProducerId
+func (p *PostgresWriteEventStore) getProducerIDForStreamName(streamName types.StreamName) types.ProducerID {
+	var producerID types.ProducerID
 
 	row := p.sqlManager.QueryRow(
 		`SELECT "producerId" FROM "producerStreamRelations" WHERE "streamName" = $1 LIMIT 1`,
 		streamName.Name)
 
-	if err := row.Scan(&producerId.UUID); err != nil {
-		return producerId
+	if err := row.Scan(&producerID.UUID); err != nil {
+		return producerID
 	}
 
-	return producerId
+	return producerID
 }
 
-func (p *postgresWriteEventStore) createSequence(streamName types.StreamName, eventName string) error {
+func (p *PostgresWriteEventStore) createSequence(streamName types.StreamName, eventName string) error {
 	var err error
 	query := fmt.Sprintf(`CREATE SEQUENCE IF NOT EXISTS %s%s START 1;`, streamName.Name, eventName)
 
@@ -80,21 +81,21 @@ func (p *postgresWriteEventStore) createSequence(streamName types.StreamName, ev
 	return nil
 }
 
-func (p *postgresWriteEventStore) saveProducerStreamRelation(producerId types.ProducerId, streamName types.StreamName) {
+func (p *PostgresWriteEventStore) saveProducerStreamRelation(producerID types.ProducerID, streamName types.StreamName) {
 	_, _ = p.sqlManager.Exec(
 		`INSERT INTO "producerStreamRelations" ("producerId", "streamName") VALUES ($1, $2) ON CONFLICT ("streamName") DO NOTHING`,
-		producerId.UUID, streamName.Name)
+		producerID.UUID, streamName.Name)
 }
 
-func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, streamName types.StreamName, eventId types.EventId) (string, error) {
-	eventName, sequence, err := p.getEventNameAndSequence(streamName, eventId)
+func (p *PostgresWriteEventStore) AcknowledgeEvent(consumerID types.ConsumerID, streamName types.StreamName, eventID types.EventID) (string, error) {
+	eventName, sequence, err := p.getEventNameAndSequence(streamName, eventID)
 	var message string
 
 	if err != nil {
 		return message, err
 	}
 
-	consumerOffset, err := p.getConsumerOffset(consumerId, streamName, eventName)
+	consumerOffset, err := p.getConsumerOffset(consumerID, streamName, eventName)
 
 	if err != nil {
 		return message, err
@@ -110,26 +111,26 @@ func (p *postgresWriteEventStore) AcknowledgeEvent(consumerId types.ConsumerId, 
 	_, err = p.sqlManager.Exec(`INSERT INTO "consumerOffsets" ("consumerId", "streamName", "eventName", "offset") 
 				VALUES ($1, $2, $3, $4) ON CONFLICT ("consumerId", "streamName", "eventName") 
 				DO UPDATE SET "offset" = EXCLUDED."offset", "movedAt" = now()`,
-		consumerId.UUID.String(), streamName.Name, eventName.Name, nextOffset.Offset)
+		consumerID.UUID.String(), streamName.Name, eventName.Name, nextOffset.Offset)
 
 	if err != nil {
 		return message, err
 	}
 
 	return fmt.Sprintf(
-		"Successfully moved offset to %d for cosumer id %s", nextOffset.Offset, consumerId.UUID.String()), nil
+		"Successfully moved offset to %d for cosumer id %s", nextOffset.Offset, consumerID.UUID.String()), nil
 }
 
-func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.StreamName, eventId types.EventId) (types.EventName, types.Sequence, error) {
+func (p *PostgresWriteEventStore) getEventNameAndSequence(streamName types.StreamName, eventID types.EventID) (types.EventName, types.Sequence, error) {
 	var eventName types.EventName
 	var sequence types.Sequence
 
 	row := p.sqlManager.QueryRow(
 		`SELECT "eventName", "sequence" FROM "events" WHERE "streamName" = $1 AND "eventId" = $2 LIMIT 1`,
-		streamName.Name, eventId.UUID.String())
+		streamName.Name, eventID.UUID.String())
 
 	if err := row.Scan(&eventName.Name, &sequence.Pointer); err != nil {
-		err := fmt.Errorf(fmt.Sprintf("event not found in stream %s/%s", streamName.Name, eventId.UUID.String()))
+		err := fmt.Errorf(fmt.Sprintf("event not found in stream %s/%s", streamName.Name, eventID.UUID.String()))
 
 		return eventName, sequence, err
 	}
@@ -137,15 +138,15 @@ func (p *postgresWriteEventStore) getEventNameAndSequence(streamName types.Strea
 	return eventName, sequence, nil
 }
 
-func (p *postgresWriteEventStore) getConsumerOffset(
-	consumerId types.ConsumerId,
+func (p *PostgresWriteEventStore) getConsumerOffset(
+	consumerID types.ConsumerID,
 	streamName types.StreamName,
 	eventName types.EventName) (types.ConsumerOffset, error) {
 	var consumerOffset types.ConsumerOffset
 
 	row := p.sqlManager.QueryRow(
 		`SELECT COALESCE((SELECT "offset" FROM "consumerOffsets" WHERE "consumerId" = $1 AND "eventName" = $2 AND "streamName" = $3 LIMIT 1), 0)`,
-		consumerId.UUID.String(), eventName.Name, streamName.Name)
+		consumerID.UUID.String(), eventName.Name, streamName.Name)
 
 	if err := row.Scan(&consumerOffset.Offset); err != nil {
 		return consumerOffset, err
@@ -154,13 +155,13 @@ func (p *postgresWriteEventStore) getConsumerOffset(
 	return consumerOffset, nil
 }
 
-func (p *postgresWriteEventStore) UpdateConsumerOffset(
-	consumerId types.ConsumerId,
+func (p *PostgresWriteEventStore) UpdateConsumerOffset(
+	consumerID types.ConsumerID,
 	streamName types.StreamName,
 	eventName types.EventName,
 	newOffset types.ConsumerOffset) error {
 
-	eventCountForConsumerAndStream, err := p.countEventsForConsumerAndStream(streamName, consumerId, eventName)
+	eventCountForConsumerAndStream, err := p.countEventsForConsumerAndStream(streamName, consumerID, eventName)
 
 	if err != nil {
 		return err
@@ -177,7 +178,7 @@ func (p *postgresWriteEventStore) UpdateConsumerOffset(
                 WHERE "consumerId" = $2
                 AND "eventName" = $3
                 AND "streamName" = $4`,
-		newOffset.Offset, consumerId.UUID.String(), eventName.Name, streamName.Name)
+		newOffset.Offset, consumerID.UUID.String(), eventName.Name, streamName.Name)
 
 	if err != nil {
 		return err
@@ -186,9 +187,9 @@ func (p *postgresWriteEventStore) UpdateConsumerOffset(
 	return nil
 }
 
-func (p *postgresWriteEventStore) countEventsForConsumerAndStream(
+func (p *PostgresWriteEventStore) countEventsForConsumerAndStream(
 	streamName types.StreamName,
-	consumerId types.ConsumerId,
+	consumerID types.ConsumerID,
 	eventName types.EventName) (types.ConsumerOffset, error) {
 	var currentPossibleConsumerOffset types.ConsumerOffset
 
@@ -200,7 +201,7 @@ func (p *postgresWriteEventStore) countEventsForConsumerAndStream(
                 WHERE e."streamName" = $1
                 AND e."eventName" = $2
                 AND cO."consumerId" = $3`,
-		streamName.Name, eventName.Name, consumerId.UUID.String())
+		streamName.Name, eventName.Name, consumerID.UUID.String())
 
 	if err := row.Scan(&currentPossibleConsumerOffset.Offset); err != nil {
 		return currentPossibleConsumerOffset, err

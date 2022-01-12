@@ -1,26 +1,27 @@
 package input
 
 import (
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
-type receiveEvents struct {
-	ConsumerId uuid.UUID
+type ReceiveEvents struct {
+	ConsumerID uuid.UUID
 	StreamName string `validate:"required"`
 	EventName  string `validate:"required"`
 	Limit      int    `validate:"required"`
 }
 
 // NewReceiveEventsFromRequest creates valid receive events input
-func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
+func NewReceiveEventsFromRequest(r *http.Request) (*ReceiveEvents, error) {
 	vars := mux.Vars(r)
-	consumerId, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))
+	consumerID, err := uuid.Parse(r.Header.Get("X-Consumer-ID"))
 
 	if err != nil {
-		return nil, ErrConsumerId
+		return nil, ErrConsumerID
 	}
 
 	params := r.URL.Query()
@@ -30,8 +31,8 @@ func NewReceiveEventsFromRequest(r *http.Request) (*receiveEvents, error) {
 		return nil, ErrLimit
 	}
 
-	return &receiveEvents{
-		ConsumerId: consumerId,
+	return &ReceiveEvents{
+		ConsumerID: consumerID,
 		StreamName: vars["streamName"],
 		EventName:  params.Get("eventName"),
 		Limit:      limit,

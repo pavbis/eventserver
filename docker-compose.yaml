@@ -31,5 +31,13 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_DB: testdb
 
+  linter:
+    image: golangci/golangci-lint
+    networks:
+      - eventserver
+    volumes:
+      - .:/code
+    working_dir: /code
+
 networks:
   eventserver:

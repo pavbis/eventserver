@@ -49,7 +49,7 @@ func TestStatsEventsPerStreamWithValidHeadersValidHeaders(t *testing.T) {
 
 func TestReceiveEventsWithoutQueryParametersValidHeaders(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/streams/mavi/events", nil)
-	req.Header.Add("X-Consumer-ID", testConsumerId)
+	req.Header.Add("X-Consumer-ID", testConsumerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
@@ -61,19 +61,19 @@ func TestReceiveEventsWithoutQueryParametersValidHeaders(t *testing.T) {
 
 func TestReceiveEventsWithoutEventNameQueryParameter(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/streams/mavi/events?limit=10", nil)
-	req.Header.Add("X-Consumer-ID", testConsumerId)
+	req.Header.Add("X-Consumer-ID", testConsumerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
 	checkMessageValue(t,
 		response.Body.Bytes(),
 		"error",
-		"Key: 'receiveEvents.EventName' Error:Field validation for 'EventName' failed on the 'required' tag")
+		"Key: 'ReceiveEvents.EventName' Error:Field validation for 'EventName' failed on the 'required' tag")
 }
 
 func TestReceiveEventsWithValidParameters(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/streams/mavi/events?limit=10&eventName=Snickers", nil)
-	req.Header.Add("X-Consumer-ID", testConsumerId)
+	req.Header.Add("X-Consumer-ID", testConsumerID)
 	response := executeRequest(req)
 	expected, _ := readFileContent("testdata/output/receive_events/valid_response.json")
 
@@ -83,7 +83,7 @@ func TestReceiveEventsWithValidParameters(t *testing.T) {
 
 func TestReceiveEventsWithValidParametersReturnsEmptyResult(t *testing.T) {
 	req := authRequest(http.MethodGet, "/api/v1/streams/void/events?limit=10&eventName=Snickers", nil)
-	req.Header.Add("X-Consumer-ID", testConsumerId)
+	req.Header.Add("X-Consumer-ID", testConsumerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
@@ -123,7 +123,7 @@ func TestSearchRequestHandlerWithMissingQueryArgument(t *testing.T) {
 	checkMessageValue(t,
 		response.Body.Bytes(),
 		"error",
-		"Key: 'searchTermRequest.Term' Error:Field validation for 'Term' failed on the 'required' tag")
+		"Key: 'SearchTermRequest.Term' Error:Field validation for 'Term' failed on the 'required' tag")
 }
 
 func TestSearchRequestHandlerWithQueryArgument(t *testing.T) {
@@ -161,13 +161,13 @@ func TestReceiveEventRequestHandlerWithoutProducerIdHeader(t *testing.T) {
 	checkMessageValue(t,
 		response.Body.Bytes(),
 		"error",
-		"Key: 'receiveEventRequest.XProducerId' Error:Field validation for 'XProducerId' failed on the 'required' tag")
+		"Key: 'ReceiveEventRequest.XProducerID' Error:Field validation for 'XProducerID' failed on the 'required' tag")
 }
 
 func TestReceiveEventRequestHandlerWithValidHeadersAndPayload(t *testing.T) {
 	payload, _ := readFileContent("testdata/input/receive_event.json")
 	req := authRequest(http.MethodPost, "/api/v1/streams/integration/events", bytes.NewBuffer(payload))
-	req.Header.Add("X-Producer-ID", testProducerId)
+	req.Header.Add("X-Producer-ID", testProducerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusCreated, response.Code)
@@ -183,7 +183,7 @@ func TestReceiveEventRequestHandlerWithInvalidProducerIDForReservedStream(t *tes
 	checkMessageValue(t,
 		response.Body.Bytes(),
 		"error",
-		fmt.Sprintf("stream is reserved for another producer %s", testProducerId))
+		fmt.Sprintf("stream is reserved for another producer %s", testProducerID))
 }
 
 func TestReceiveAcknowledgementRequestHandlerWithMissingConsumerId(t *testing.T) {
@@ -200,26 +200,26 @@ func TestReceiveAcknowledgementRequestHandlerWithMissingConsumerId(t *testing.T)
 func TestReceiveAcknowledgementRequestHandlerWithConsumerId(t *testing.T) {
 	payload, _ := readFileContent("testdata/input/receive_event.json")
 	receiveEventReq := authRequest(http.MethodPost, "/api/v1/streams/integrationTwo/events", bytes.NewBuffer(payload))
-	receiveEventReq.Header.Add("X-Producer-ID", testProducerId)
+	receiveEventReq.Header.Add("X-Producer-ID", testProducerID)
 	receiveEventResponse := executeRequest(receiveEventReq)
 
 	var m map[string]interface{}
 	_ = json.Unmarshal(receiveEventResponse.Body.Bytes(), &m)
 	// grab the created event id
-	eventId := m["uuid"]
+	eventID := m["uuid"]
 
-	req := authRequest(http.MethodPost, fmt.Sprintf("/api/v1/streams/integrationTwo/events/%s", eventId), nil)
-	req.Header.Add("X-Consumer-ID", testConsumerId)
+	req := authRequest(http.MethodPost, fmt.Sprintf("/api/v1/streams/integrationTwo/events/%s", eventID), nil)
+	req.Header.Add("X-Consumer-ID", testConsumerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
 
-	checkResponseBody(t, response.Body.String(), fmt.Sprintf(`"Successfully moved offset to 1 for cosumer id %s"`, testConsumerId))
+	checkResponseBody(t, response.Body.String(), fmt.Sprintf(`"Successfully moved offset to 1 for cosumer id %s"`, testConsumerID))
 }
 
 func TestReceiveAcknowledgementRequestHandlerWithNotExistentEvent(t *testing.T) {
 	req := authRequest(http.MethodPost, "/api/v1/streams/integrationTwo/events/ef452ece-667b-4af3-a09b-8c1a692d818d", nil)
-	req.Header.Add("X-Consumer-ID", testConsumerId)
+	req.Header.Add("X-Consumer-ID", testConsumerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
@@ -232,22 +232,22 @@ func TestReceiveAcknowledgementRequestHandlerWithNotExistentEvent(t *testing.T) 
 func TestReceiveAcknowledgementRequestHandlerConsumerOffsetMismatch(t *testing.T) {
 	payload, _ := readFileContent("testdata/input/receive_event.json")
 	receiveFirstEventReq := authRequest(http.MethodPost, "/api/v1/streams/integrationThree/events", bytes.NewBuffer(payload))
-	receiveFirstEventReq.Header.Add("X-Producer-ID", testProducerId)
+	receiveFirstEventReq.Header.Add("X-Producer-ID", testProducerID)
 	rr := httptest.NewRecorder()
 	s.router.ServeHTTP(rr, receiveFirstEventReq)
 
 	payloadTwo, _ := readFileContent("testdata/input/receive_event.json")
 	receiveSecondEventReq := authRequest(http.MethodPost, "/api/v1/streams/integrationThree/events", bytes.NewBuffer(payloadTwo))
-	receiveSecondEventReq.Header.Add("X-Producer-ID", testProducerId)
+	receiveSecondEventReq.Header.Add("X-Producer-ID", testProducerID)
 	receiveEventResponse := executeRequest(receiveSecondEventReq)
 
 	var m map[string]interface{}
 	_ = json.Unmarshal(receiveEventResponse.Body.Bytes(), &m)
 	// grab the created event id
-	eventId := m["uuid"]
+	eventID := m["uuid"]
 
-	req := authRequest(http.MethodPost, fmt.Sprintf("/api/v1/streams/integrationThree/events/%s", eventId), nil)
-	req.Header.Add("X-Consumer-ID", testConsumerId)
+	req := authRequest(http.MethodPost, fmt.Sprintf("/api/v1/streams/integrationThree/events/%s", eventID), nil)
+	req.Header.Add("X-Consumer-ID", testConsumerID)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
@@ -319,15 +319,15 @@ func TestGetEventPayloadWithNotExistentUuid(t *testing.T) {
 func TestGetEventPayloadWithExistentUuid(t *testing.T) {
 	payloadTwo, _ := readFileContent("testdata/input/receive_event.json")
 	receiveSecondEventReq := authRequest(http.MethodPost, "/api/v1/streams/integrationThree/events", bytes.NewBuffer(payloadTwo))
-	receiveSecondEventReq.Header.Add("X-Producer-ID", testProducerId)
+	receiveSecondEventReq.Header.Add("X-Producer-ID", testProducerID)
 	receiveEventResponse := executeRequest(receiveSecondEventReq)
 
 	var m map[string]interface{}
 	_ = json.Unmarshal(receiveEventResponse.Body.Bytes(), &m)
 	// grab the created event id
-	eventId := m["uuid"]
+	eventID := m["uuid"]
 
-	req := authRequest(http.MethodGet, fmt.Sprintf("/api/v1/events/%s/payload", eventId), nil)
+	req := authRequest(http.MethodGet, fmt.Sprintf("/api/v1/events/%s/payload", eventID), nil)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)

@@ -18,12 +18,12 @@ func TestReceiveAcknowledgementFromRequestErrors(t *testing.T) {
 		{
 			name:           "Test with invalid consumer id",
 			input:          http.Request{},
-			expectedResult: ErrConsumerId,
+			expectedResult: ErrConsumerID,
 		},
 		{
 			name:           "Test with valid consumer id but invalid event id",
 			input:          http.Request{Header: header},
-			expectedResult: ErrEventId,
+			expectedResult: ErrEventID,
 		},
 	}
 
