@@ -1,31 +1,31 @@
-name: Go
+name: Verify Pull Request
 
 on:
-  workflow_dispatch: null
+  pull_request:
+    branches: []
 
 jobs:
 
   build:
     name: Build
     runs-on: ubuntu-latest
-    
     services:
       postgres:
         image: postgres:12
         env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: root
-          POSTGRES_DB: testdb
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s
     
     steps:
 
-    - name: Set up Go 1.x
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.16
+        go-version: 1.17.5
       id: go
 
     - name: Check out code into the Go module directory
@@ -34,10 +34,6 @@ jobs:
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
 
     - name: Build
       run: go build -v .
@@ -48,9 +44,9 @@ jobs:
     - name: Test
       run: go test -v -race -coverpkg=./... -coverprofile=coverage.txt ./...
       env:
-        DATABASE_URL: user=root password=root dbname=testdb host=localhost port=5432 sslmode=disable
-        AUTH_USER: test
-        AUTH_PASS: test  
+        DATABASE_URL: user=${{ secrets.POSTGRES_USER }} password=${{ secrets.POSTGRES_PASSWORD }} dbname=${{ secrets.POSTGRES_DB }} host=localhost port=5432 sslmode=disable
+        AUTH_USER: ${{ secrets.AUTH_USER }}
+        AUTH_PASS: ${{ secrets.AUTH_PASS }}
       
     - name: Code coverage
       run: go tool cover -func coverage.txt
