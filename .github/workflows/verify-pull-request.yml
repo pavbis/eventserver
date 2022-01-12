@@ -1,7 +1,8 @@
-name: Go
+name: Verify Pull Request
 
 on:
-  workflow_dispatch: null
+  pull_request:
+    branches: []
 
 jobs:
 
