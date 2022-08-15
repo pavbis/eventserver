@@ -61,11 +61,12 @@ func (s *Server) Run(addr string) {
 	loggedRouter := s.createLoggingRouter(s.logger.Writer())
 
 	srv := &http.Server{
-		Handler:      loggedRouter,
-		Addr:         addr,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		Handler:           loggedRouter,
+		Addr:              addr,
+		WriteTimeout:      15 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		IdleTimeout:       120 * time.Second,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	s.logger.Fatal(srv.ListenAndServe())
