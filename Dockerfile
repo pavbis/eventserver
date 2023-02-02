@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.19.5
+ARG GO_VERSION=1.20.0
 
 FROM golang:${GO_VERSION}-buster AS build_base
 WORKDIR /build
