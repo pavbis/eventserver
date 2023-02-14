@@ -15,4 +15,5 @@ require (
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/stretchr/testify v1.8.1
+	golang.org/x/crypto v0.6.0 // indirect
 )
