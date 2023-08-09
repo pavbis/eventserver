@@ -1,6 +1,6 @@
-ARG GO_VERSION=1.20.7
+ARG GO_VERSION=1.21
 
-FROM golang:${GO_VERSION}-buster AS build_base
+FROM golang:${GO_VERSION}-alpine AS build_base
 WORKDIR /build
 COPY . /build
 RUN go mod download && CGO_ENABLED=0 GOOS=linux go build -x -installsuffix cgo -o eventserver .
