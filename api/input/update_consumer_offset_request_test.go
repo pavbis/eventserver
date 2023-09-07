@@ -20,6 +20,7 @@ func TestUpdateConsumerOffsetRequestErrors(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		//nolint:gosec
 		_, err := NewUpdateConsumerOffsetRequest(&test.input)
 		if !reflect.DeepEqual(err, test.expectedResult) {
 			t.Errorf(
