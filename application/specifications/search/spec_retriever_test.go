@@ -28,6 +28,7 @@ func TestSpecRetrieverError(t *testing.T) {
 	for _, test := range tests {
 		specList := SpecList{}
 		specRetriever := NewSpecRetriever(specList.ListAll())
+		//nolint:gosec
 		result, err := specRetriever.FindSpec(&test.input)
 
 		if !errors.Is(err, test.error) {
@@ -89,6 +90,7 @@ func TestSpecRetrieverFindSpec(t *testing.T) {
 	for _, test := range tests {
 		specList := SpecList{}
 		specRetriever := NewSpecRetriever(specList.ListAll())
+		//nolint:gosec
 		result, _ := specRetriever.FindSpec(&test.input)
 		expression := result.AndExpression()
 
