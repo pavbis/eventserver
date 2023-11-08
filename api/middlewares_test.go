@@ -11,6 +11,7 @@ import (
 const (
 	expectedContentType = "application/json"
 	dummyURL            = "http://www.your-domain.com"
+	basicAuth           = "Basic "
 )
 
 func TestBasicAuthMiddlewareWithoutHeader(t *testing.T) {
@@ -44,7 +45,7 @@ func TestBasicAuthMiddlewareWithInvalidCredentials(t *testing.T) {
 	nextMiddleware := func(w http.ResponseWriter, r *http.Request) {}
 
 	req := httptest.NewRequest(http.MethodGet, dummyURL, nil)
-	req.Header.Add("Authorization", "Basic "+base64.URLEncoding.EncodeToString([]byte(`invalid:invalid`)))
+	req.Header.Add("Authorization", basicAuth+base64.URLEncoding.EncodeToString([]byte(`invalid:invalid`)))
 	res := httptest.NewRecorder()
 
 	basicAuthMiddleware := basicAuthMiddleware(os.Getenv("AUTH_USER"), os.Getenv("AUTH_PASS"), nextMiddleware)
@@ -74,7 +75,7 @@ func TestBasicAuthMiddlewareWithValidCredentials(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, dummyURL, nil)
 	validAuthString := os.Getenv("AUTH_USER") + ":" + os.Getenv("AUTH_PASS")
-	validEncodedAuth := "Basic " + base64.URLEncoding.EncodeToString([]byte(validAuthString))
+	validEncodedAuth := basicAuth + base64.URLEncoding.EncodeToString([]byte(validAuthString))
 
 	req.Header.Add("Authorization", validEncodedAuth)
 	res := httptest.NewRecorder()
