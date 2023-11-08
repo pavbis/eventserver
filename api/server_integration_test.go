@@ -344,5 +344,5 @@ func authRequest(method string, url string, body io.Reader) *http.Request {
 
 func basicAuthValue() string {
 	auth := os.Getenv("AUTH_USER") + ":" + os.Getenv("AUTH_PASS")
-	return "Basic " + base64.URLEncoding.EncodeToString([]byte(auth))
+	return basicAuth + base64.URLEncoding.EncodeToString([]byte(auth))
 }

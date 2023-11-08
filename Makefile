@@ -30,7 +30,7 @@ help:
 
 ## Run golang ci lint with all linters.
 go_lint_all:
-	docker-compose run --rm linter golangci-lint run -v
+	docker-compose run --rm linter golangci-lint run -v --timeout=10m
 .PHONY: go_lint_all
 
 ## Build app and start containers
