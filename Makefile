@@ -30,7 +30,7 @@ help:
 
 ## Run golang ci lint with all linters.
 go_lint_all:
-	docker-compose run --rm linter golangci-lint run -v --timeout=10m
+	docker compose run --rm linter golangci-lint run -v --timeout=10m
 .PHONY: go_lint_all
 
 ## Build app and start containers
@@ -39,12 +39,12 @@ build_app_and_start: build_app start_containers
 
 ## Build go binary.
 build_app:
-	docker-compose build --force-rm app
+	docker compose build --force-rm app
 .PHONY: build_app
 
 ## Start containers.
 start_containers:
-	docker-compose up -d --force-recreate --remove-orphans
+	docker compose up -d --force-recreate --remove-orphans
 .PHONY: start_container
 
 ## Run tests with coverage.
