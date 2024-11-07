@@ -9,5 +9,3 @@ linters:
     - ineffassign
     - staticcheck
     - unconvert
-    - vet
-    - vetshadow
