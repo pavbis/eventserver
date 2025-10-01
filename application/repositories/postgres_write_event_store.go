@@ -36,7 +36,7 @@ func (p *PostgresWriteEventStore) RecordEvent(
 	}
 
 	if relatedProducerID.UUID != producerID.UUID {
-		err := fmt.Errorf(fmt.Sprintf("stream is reserved for another producer %s", relatedProducerID.UUID))
+		err := fmt.Errorf("%s", fmt.Sprintf("stream is reserved for another producer %s", relatedProducerID.UUID))
 		return eventID, err
 	}
 
@@ -104,7 +104,7 @@ func (p *PostgresWriteEventStore) AcknowledgeEvent(consumerID types.ConsumerID, 
 	nextOffset := consumerOffset.Increment()
 
 	if nextOffset.Offset != sequence.Pointer {
-		err := fmt.Errorf(fmt.Sprintf("Consumer offset mismatch: %d->%d", nextOffset.Offset, sequence.Pointer))
+		err := fmt.Errorf("%s", fmt.Sprintf("Consumer offset mismatch: %d->%d", nextOffset.Offset, sequence.Pointer))
 		return message, err
 	}
 
@@ -130,7 +130,7 @@ func (p *PostgresWriteEventStore) getEventNameAndSequence(streamName types.Strea
 		streamName.Name, eventID.UUID.String())
 
 	if err := row.Scan(&eventName.Name, &sequence.Pointer); err != nil {
-		err := fmt.Errorf(fmt.Sprintf("event not found in stream %s/%s", streamName.Name, eventID.UUID.String()))
+		err := fmt.Errorf("%s", fmt.Sprintf("event not found in stream %s/%s", streamName.Name, eventID.UUID.String()))
 
 		return eventName, sequence, err
 	}
