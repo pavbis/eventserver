@@ -12,7 +12,7 @@
 
 Server with HTTP API to manage events and consumer offsets
 
-## API
+## Api
 
 ### Receiving an event for a specific stream
 
